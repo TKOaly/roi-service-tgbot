@@ -1,7 +1,7 @@
 {
   "name": "roi-service-tgbot",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Telegram bot to broadcast Jobs service notifications",
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
