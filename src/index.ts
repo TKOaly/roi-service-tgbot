@@ -4,13 +4,12 @@ dotenv.config();
 import TelegramBot from "node-telegram-bot-api";
 import {
   chatIdFile,
+  fetchNewJobPostings,
   fileExistsAsync,
   getChatIds,
-  jobFile,
-  writeFileAsync,
+  getNewJobPostings,
 } from "./FileUtils";
 import { logger } from "./Logger";
-import { getJobs } from "./services/JobService";
 
 if (!process.env.TELEGRAM_API_KEY) {
   throw new Error("Please define a Telegram API key.");
@@ -19,16 +18,7 @@ if (!process.env.TELEGRAM_API_KEY) {
 const app = async (telegramApiKey: string) => {
   try {
     // Sync jobs.json
-    logger.info("Fetching jobs", {
-      jobs_backend_url: process.env.JOBS_BACKEND_URL,
-    });
-    const jobs = await getJobs();
-    logger.info("Fetched jobs", {
-      jobs_backend_url: process.env.JOBS_BACKEND_URL,
-    });
-    logger.info("Writing jobs to file", { jobFile });
-    await writeFileAsync(jobFile, JSON.stringify(jobs));
-    logger.info("Wrote jobs to file", { jobFile });
+    await fetchNewJobPostings();
 
     logger.info("Starting Telegram bot instance");
     const bot = new TelegramBot(telegramApiKey, {
@@ -45,18 +35,43 @@ const app = async (telegramApiKey: string) => {
       logger.warn("Chat ID file does not exist", { chatIdFile });
     } else {
       logger.info("Starting Chat ID check interval");
+      // Set job check interval
       setInterval(async () => {
         logger.info("Reading chat IDs to broadcast");
-        const chatIds = await getChatIds();
-        if (chatIds.length > 0) {
+        // Checks for updated jobs
+        const newJobs = await getNewJobPostings();
+        // If there are new job postings available
+        if (newJobs.length > 0) {
           await Promise.all(
-            chatIds.map((chatId) => {
-              logger.info("Sending job info to chat", { chatId });
-              return bot.sendMessage(chatId, "Hello world");
+            newJobs.map(async (newJob) => {
+              logger.info("Detected new job", {
+                title: newJob.title,
+                company: newJob.company,
+                url: newJob.url,
+              });
+              const chatIds = await getChatIds();
+              if (chatIds.length > 0) {
+                return chatIds.map((chatId) => {
+                  logger.info("Sending job info to chat", { chatId });
+                  return bot.sendMessage(
+                    chatId,
+                    `*New job: ${newJob.company} - ${
+                      newJob.title
+                    }*\r\nApply before ${newJob.end}`,
+                    {
+                      parse_mode: "Markdown",
+                    },
+                  );
+                });
+              }
             }),
           );
+        } else {
+          logger.info("No new jobs at the moment.");
         }
-      }, 20000);
+        // Fetch new job postings (and save them locally)
+        await fetchNewJobPostings();
+      }, 30000);
     }
   } catch (err) {
     logger.error(err.toString());
