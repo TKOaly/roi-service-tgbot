@@ -10,7 +10,7 @@ export const writeFileAsync = promisify(fs.writeFile);
 export const readFileAsync = promisify(fs.readFile);
 export const fileExistsAsync = promisify(fs.exists);
 
-export const readChatIds = async () => {
+export const getChatIds = async () => {
   const chatIds = await readFileAsync(chatIdFile);
   const parsedChatIds = JSON.parse(chatIds.toString());
   return Array.isArray(parsedChatIds) ? (parsedChatIds as string[]) : [];
@@ -19,5 +19,5 @@ export const readChatIds = async () => {
 export const hasNewJobPostings = async () => {
   const jobs = await getJobs();
   const existingJobs = await readFileAsync(jobFile);
-  // TODO
+  // TODO: A simple function to return either true or false if the job posting has new offerings
 };

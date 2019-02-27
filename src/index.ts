@@ -5,8 +5,8 @@ import TelegramBot from "node-telegram-bot-api";
 import {
   chatIdFile,
   fileExistsAsync,
+  getChatIds,
   jobFile,
-  readChatIds,
   writeFileAsync,
 } from "./FileUtils";
 import { logger } from "./Logger";
@@ -47,7 +47,7 @@ const app = async (telegramApiKey: string) => {
       logger.info("Starting Chat ID check interval");
       setInterval(async () => {
         logger.info("Reading chat IDs to broadcast");
-        const chatIds = await readChatIds();
+        const chatIds = await getChatIds();
         if (chatIds.length > 0) {
           await Promise.all(
             chatIds.map((chatId) => {
