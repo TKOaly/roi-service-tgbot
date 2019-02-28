@@ -53,11 +53,16 @@ const app = async (telegramApiKey: string) => {
               if (chatIds.length > 0) {
                 return chatIds.map((chatId) => {
                   logger.info("Sending job info to chat", { chatId });
+                  const canApply =
+                    newJob.end !== null
+                      ? "Apply before " + newJob.end
+                      : "Applications accepted until further notice";
+                  const jobUrl = "https://jobs.tko-aly.fi/jobs/" + newJob.id;
                   return bot.sendMessage(
                     chatId,
-                    `*New job: ${newJob.company} - ${
+                    `*New job: ${newJob.company.name} - ${
                       newJob.title
-                    }*\r\nApply before ${newJob.end}`,
+                    }*\r\n${canApply}\r\n${jobUrl}`,
                     {
                       parse_mode: "Markdown",
                     },
