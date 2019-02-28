@@ -22,7 +22,7 @@ export interface Job {
   tags: Tag[];
   description: string;
   begin: string;
-  end: string;
+  end: string | null;
   created_at: string;
   url: string;
 }
