@@ -21,7 +21,7 @@ const app = async (telegramApiKey: string) => {
     // Sync jobs.json
     await fetchNewJobPostings(jobFile);
 
-    logger.info("Starting Telegram bot instance");
+    logger.info("app(): Starting Telegram bot instance");
     const bot = new TelegramBot(telegramApiKey, {
       polling: true,
     });
@@ -33,19 +33,19 @@ const app = async (telegramApiKey: string) => {
 
     const exists = await fileExistsAsync(chatIdFile);
     if (!exists) {
-      logger.warn("Chat ID file does not exist", { chatIdFile });
+      logger.warn("app(): Chat ID file does not exist", { chatIdFile });
     } else {
-      logger.info("Starting Chat ID check interval");
+      logger.info("app(): Starting Chat ID check interval");
       // Set job check interval
       setInterval(async () => {
-        logger.info("Reading chat IDs to broadcast");
+        logger.info("app(): Reading chat IDs to broadcast");
         // Checks for updated jobs
         const newJobs = await getNewJobPostings(jobFile);
         // If there are new job postings available
         if (newJobs.length > 0) {
           await Promise.all(
             newJobs.map(async (newJob) => {
-              logger.info("Detected new job", {
+              logger.info("app(): Detected new job", {
                 title: newJob.title,
                 company: newJob.company,
                 url: newJob.url,
@@ -53,7 +53,7 @@ const app = async (telegramApiKey: string) => {
               const chatIds = await getChatIds(chatIdFile);
               if (chatIds.length > 0) {
                 return chatIds.map((chatId) => {
-                  logger.info("Sending job info to chat", { chatId });
+                  logger.info("app(): Sending job info to chat", { chatId });
                   const canApply =
                     newJob.end !== null
                       ? "Apply before " + newJob.end
@@ -73,7 +73,7 @@ const app = async (telegramApiKey: string) => {
             }),
           );
         } else {
-          logger.info("No new jobs at the moment.");
+          logger.info("app(): No new jobs at the moment.");
         }
         // Fetch new job postings (and save them locally)
         await fetchNewJobPostings(jobFile);
