@@ -87,13 +87,16 @@ export const isJob: Validator<Job> = (val): val is Job => {
     !isNumber(id) ||
     !isString(title) ||
     !isCompany(company) ||
-    !tags.every(isTag) ||
+    !Array.isArray(tags) ||
     !isString(description) ||
     !isString(begin) ||
     !(isString(end) || isNull(end)) ||
     !isString(created_at) ||
     !isString(url)
   ) {
+    return false;
+  }
+  if (tags.length > 0 && !tags.every(isTag)) {
     return false;
   }
   return true;
