@@ -3,3 +3,4 @@ node_modules
 *.log
 src/data/jobs.json
 src/data/chats.json
+.nyc_output

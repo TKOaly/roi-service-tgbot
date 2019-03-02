@@ -8,6 +8,7 @@ import {
   fileExistsAsync,
   getChatIds,
   getNewJobPostings,
+  jobFile,
 } from "./FileUtils";
 import { logger } from "./Logger";
 
@@ -18,7 +19,7 @@ if (!process.env.TELEGRAM_API_KEY) {
 const app = async (telegramApiKey: string) => {
   try {
     // Sync jobs.json
-    await fetchNewJobPostings();
+    await fetchNewJobPostings(jobFile);
 
     logger.info("Starting Telegram bot instance");
     const bot = new TelegramBot(telegramApiKey, {
@@ -39,7 +40,7 @@ const app = async (telegramApiKey: string) => {
       setInterval(async () => {
         logger.info("Reading chat IDs to broadcast");
         // Checks for updated jobs
-        const newJobs = await getNewJobPostings();
+        const newJobs = await getNewJobPostings(jobFile);
         // If there are new job postings available
         if (newJobs.length > 0) {
           await Promise.all(
@@ -49,7 +50,7 @@ const app = async (telegramApiKey: string) => {
                 company: newJob.company,
                 url: newJob.url,
               });
-              const chatIds = await getChatIds();
+              const chatIds = await getChatIds(chatIdFile);
               if (chatIds.length > 0) {
                 return chatIds.map((chatId) => {
                   logger.info("Sending job info to chat", { chatId });
@@ -75,7 +76,7 @@ const app = async (telegramApiKey: string) => {
           logger.info("No new jobs at the moment.");
         }
         // Fetch new job postings (and save them locally)
-        await fetchNewJobPostings();
+        await fetchNewJobPostings(jobFile);
       }, 30000);
     }
   } catch (err) {

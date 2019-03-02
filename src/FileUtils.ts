@@ -13,17 +13,24 @@ export const writeFileAsync = promisify(fs.writeFile);
 export const readFileAsync = promisify(fs.readFile);
 export const fileExistsAsync = promisify(fs.exists);
 
-export const getChatIds = async () => {
-  const chatIds = await readFileAsync(chatIdFile);
+export const getChatIds = async (chatFile: string) => {
+  const chatIds = await readFileAsync(chatFile);
   const parsedChatIds = JSON.parse(chatIds.toString());
-  return Array.isArray(parsedChatIds) ? (parsedChatIds as string[]) : [];
+  if (!Array.isArray(parsedChatIds)) {
+    return [];
+  }
+
+  if (!parsedChatIds.every(isString)) {
+    return [];
+  }
+  return Array.from<string>(parsedChatIds);
 };
 
-export const getNewJobPostings = async () => {
+export const getNewJobPostings = async (path: string) => {
   // Fetch jobs from the back-end
   const jobs = await getJobs();
   // Read the local job file
-  const existingJobs = await readFileAsync(jobFile);
+  const existingJobs = await readFileAsync(path);
   // Do a diff
   const diff = _.differenceWith(
     jobs,
@@ -33,7 +40,7 @@ export const getNewJobPostings = async () => {
   return diff;
 };
 
-export const fetchNewJobPostings = async () => {
+export const fetchNewJobPostings = async (outputFile: string) => {
   logger.info("Fetching jobs", {
     jobs_backend_url: process.env.JOBS_BACKEND_URL,
   });
@@ -41,7 +48,7 @@ export const fetchNewJobPostings = async () => {
   logger.info("Fetched jobs", {
     jobs_backend_url: process.env.JOBS_BACKEND_URL,
   });
-  logger.info("Writing jobs to file", { jobFile });
-  await writeFileAsync(jobFile, JSON.stringify(jobs));
-  logger.info("Wrote jobs to file", { jobFile });
+  logger.info("Writing jobs to file", { outputFile });
+  await writeFileAsync(outputFile, JSON.stringify(jobs));
+  logger.info("Wrote jobs to file", { outputFile });
 };
