@@ -68,8 +68,8 @@ export const getNewJobPostings = async (jobFilePath: string) => {
  * @param fetchedJobs Job set 2
  */
 export const jobDifference = (existingJobs: Job[], fetchedJobs: Job[]) => {
-  // Use Lodash's differenceWith() function to calculate the difference
-  const diff = _.differenceWith(existingJobs, fetchedJobs, _.isEqual);
+  // Use Lodash's difference() function to calculate the difference
+  const diff = _.difference(fetchedJobs, existingJobs);
   if (diff.length > 5) {
     logger.warn(
       `jobDifference(): Detected ${

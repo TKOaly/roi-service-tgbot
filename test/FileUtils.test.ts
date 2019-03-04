@@ -3,13 +3,16 @@ import "mocha";
 import { join } from "path";
 import { getChatIds } from "../src/FileUtils";
 
-// const testChatIdFile = join(__dirname, "testChatIds.json");
-const testChatIdFile = join(__dirname, "invalidChatIds.json");
-
-// ["12345", "67890"]
+const validIds = join(__dirname, "testChatIds.json");
+const invalidIds = join(__dirname, "invalidChatIds.json");
 
 describe("FileUtils", () => {
-  it("Throws an error on a malformed ChatID file", (done) => {
-    done();
+  it("Returns an empty array on a malformed ChatID file", async () => {
+    const chatIds = await getChatIds(invalidIds);
+    expect(chatIds).to.eql([]);
+  });
+  it("Returns an array of Chat IDs with the correct file", async () => {
+    const chatIds = await getChatIds(validIds);
+    expect(chatIds).to.eql(["12345", "67890"]);
   });
 });

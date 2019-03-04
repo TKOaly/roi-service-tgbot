@@ -1,8 +1,45 @@
 import { expect } from "chai";
 import "mocha";
-import { isCompany, isJob, isTag } from "../src/Validators";
+import {
+  isBoolean,
+  isCompany,
+  isJob,
+  isNumber,
+  isString,
+  isTag,
+} from "../src/Validators";
 
 describe("Validators", () => {
+  it("Validates string #1", (done) => {
+    const test = "Hello";
+    expect(isString(test)).to.equal(true);
+    done();
+  });
+  it("Validates string #2", (done) => {
+    const test = 5;
+    expect(isString(test)).to.equal(false);
+    done();
+  });
+  it("Validates number #1", (done) => {
+    const test = 55;
+    expect(isNumber(test)).to.equal(true);
+    done();
+  });
+  it("Validates number #2", (done) => {
+    const test = "5";
+    expect(isNumber(test)).to.equal(false);
+    done();
+  });
+  it("Validates boolean #1", (done) => {
+    const test = true;
+    expect(isBoolean(test)).to.equal(true);
+    done();
+  });
+  it("Validates boolean #2", (done) => {
+    const test = 1;
+    expect(isBoolean(test)).to.equal(false);
+    done();
+  });
   it("Validates tag correctly #1", (done) => {
     const obj = {
       id: 1,
