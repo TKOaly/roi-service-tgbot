@@ -100,6 +100,19 @@ describe("Validators", () => {
     expect(isCompany(obj)).to.equal(false);
     done();
   });
+  it("Validates company correctly #4", (done) => {
+    const obj = {
+      id: "1",
+      name: 5,
+      website: "example.com",
+      sponsored: false,
+      created_at: "2019-01-01 12:00:00",
+      updated_at: "2019-01-01 12:00:00",
+      logo: null,
+    };
+    expect(isCompany(obj)).to.equal(false);
+    done();
+  });
   it("Validates job correctly #1", (done) => {
     const obj = {
       id: 1,

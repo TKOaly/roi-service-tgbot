@@ -62,7 +62,7 @@ export const getNewJobPostings = async (jobFilePath: string) => {
     return [];
   }
   // Do a diff
-  const diff = jobDifference(jobs, parsed);
+  const diff = jobDifference(parsed, jobs);
   return diff;
 };
 
@@ -79,9 +79,10 @@ export const jobDifference = (existingJobs: Job[], fetchedJobs: Job[]) => {
   const thres = 5;
   if (diff.length >= thres) {
     logger.warn(
-      `jobDifference(): Detected ${thres} or more changes in the job diff - preventing broadcasting those as a spam prevention. Diff count: ${
-        diff.length
-      }`,
+      `jobDifference(): Detected ${thres} or more changes in the job diff -
+       preventing broadcasting those as a spam prevention. Diff count: ${
+         diff.length
+       }`,
     );
     return [];
   }
@@ -98,6 +99,7 @@ export const jobDifference = (existingJobs: Job[], fetchedJobs: Job[]) => {
 /**
  * Fetches the jobs from the API using HTTP and writes them to a file.
  * @param outputFile Output file to write the new job data.
+ * @param axiosInstance Custom Axios instance
  */
 export const fetchNewJobPostings = async (outputFile: string) => {
   logger.info("fetchNewJobPostings(): Fetching jobs", {

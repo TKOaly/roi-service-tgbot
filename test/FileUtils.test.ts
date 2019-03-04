@@ -1,12 +1,17 @@
 process.env.NODE_ENV = "test";
 
+import axios from "axios";
+import MockAdapter from "axios-mock-adapter";
+
 import { expect } from "chai";
 import fs from "fs";
 import "mocha";
 import { join } from "path";
 import {
+  fetchNewJobPostings,
   fileExistsAsync,
   getChatIds,
+  getNewJobPostings,
   jobDifference,
   parseChatIds,
   readFileAsync,
@@ -28,8 +33,11 @@ import {
   jobs6Local,
   jobs7Api,
   jobs7Local,
+  jobs8Api,
+  jobs8Local,
   newJob2,
   secondNewJob4,
+  tmpJob,
 } from "./JobData";
 
 const validIds = join(__dirname, "files", "testChatIds.json");
@@ -135,6 +143,80 @@ describe("FileUtils", () => {
     it("Returns false if file does not exists", async () => {
       const exists = await fileExistsAsync(notExists);
       expect(exists).to.equal(false);
+    });
+  });
+  describe("fetchNewJobPostings()", () => {
+    beforeEach((done) => {
+      // Setup (native funcs)
+      setupWrite(tmpTestFile);
+      done();
+    });
+    afterEach((done) => {
+      setupWrite(tmpTestFile);
+      done();
+    });
+    it("Fetches the jobs from the API using HTTP and writes them to a file", async () => {
+      const mock = new MockAdapter(axios);
+      mock.onGet("jobs.json").reply(200, jobs8Api);
+      await fetchNewJobPostings(tmpTestFile);
+      const contents = fs.readFileSync(tmpTestFile);
+      expect(contents.toString()).to.equal(JSON.stringify(jobs8Api));
+    });
+    it("Returns void if malformed jobs are returned from the backend", async () => {
+      const mock = new MockAdapter(axios);
+      mock.onGet("jobs.json").reply(200, [{ id: 1 }]);
+      const res = await fetchNewJobPostings(tmpTestFile);
+      expect(res).to.equal(undefined);
+    });
+  });
+  describe("getNewJobPostings()", () => {
+    beforeEach((done) => {
+      // Setup (native funcs)
+      setupWrite(tmpTestFile);
+      done();
+    });
+    afterEach((done) => {
+      setupWrite(tmpTestFile);
+      done();
+    });
+    it("Fetches job data from the API, then compares the returned result with a locally cached version.", async () => {
+      const mock = new MockAdapter(axios);
+      fs.writeFileSync(tmpTestFile, JSON.stringify(jobs8Local));
+      // Mock API endpoint
+      mock.onGet("jobs.json").reply(200, jobs8Api);
+      // Get new Job postings
+      const difference = await getNewJobPostings(tmpTestFile);
+      expect(difference).to.eql([tmpJob(6)]);
+    });
+    it("Returns an empty array if malformed jobs are returned from the backend", async () => {
+      const mock = new MockAdapter(axios);
+      // Mock API endpoint
+      mock
+        .onGet("jobs.json")
+        .reply(200, JSON.stringify([{ id: 1 }, { id: 2 }]));
+      // Get new Job postings
+      const difference = await getNewJobPostings(tmpTestFile);
+      expect(difference).to.eql([]);
+    });
+    it("Returns an empty array if the local job file is malformed #1", async () => {
+      // Write jobs to the disk
+      fs.writeFileSync(tmpTestFile, JSON.stringify([{ id: 1 }, { id: 2 }]));
+      const mock = new MockAdapter(axios);
+      // Mock API endpoint
+      mock.onGet("jobs.json").reply(200, JSON.stringify(jobs8Api));
+      // Get new Job postings
+      const difference = await getNewJobPostings(tmpTestFile);
+      expect(difference).to.eql([]);
+    });
+    it("Returns an empty array if the local job file is malformed #2", async () => {
+      // Write jobs to the disk
+      fs.writeFileSync(tmpTestFile, JSON.stringify({ id: 1 }));
+      const mock = new MockAdapter(axios);
+      // Mock API endpoint
+      mock.onGet("jobs.json").reply(200, JSON.stringify(jobs8Api));
+      // Get new Job postings
+      const difference = await getNewJobPostings(tmpTestFile);
+      expect(difference).to.eql([]);
     });
   });
 });
