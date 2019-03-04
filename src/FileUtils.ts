@@ -17,14 +17,18 @@ export const fileExistsAsync = promisify(fs.exists);
 
 export const getChatIds = async (chatFile: string) => {
   const chatIds = await readFileAsync(chatFile);
-  const parsedChatIds = JSON.parse(chatIds.toString());
-  if (!Array.isArray(parsedChatIds)) {
+  const rawChatIds = JSON.parse(chatIds.toString());
+  return parseChatIds(rawChatIds);
+};
+
+export const parseChatIds = (data: any) => {
+  if (!Array.isArray(data)) {
     return [];
   }
-  if (!parsedChatIds.every(isString)) {
+  if (!data.every(isString)) {
     return [];
   }
-  return Array.from<string>(parsedChatIds);
+  return Array.from<string>(data);
 };
 
 /**
