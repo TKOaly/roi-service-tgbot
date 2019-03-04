@@ -8,8 +8,15 @@ const transports =
         }),
       ]
     : [
-        new winston.transports.File({ filename: "error.log", level: "error" }),
-        new winston.transports.File({ filename: "combined.log" }),
+        new winston.transports.File({
+          filename: "error.log",
+          level: "error",
+          maxsize: 500000,
+        }),
+        new winston.transports.File({
+          filename: "combined.log",
+          maxsize: 500000,
+        }),
         new winston.transports.Console({
           format: winston.format.simple(),
         }),
