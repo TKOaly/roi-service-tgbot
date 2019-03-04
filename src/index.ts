@@ -12,8 +12,6 @@ import {
 } from "./FileUtils";
 import { logger } from "./Logger";
 
-import customAxios from "./CustomAxios";
-
 if (!process.env.TELEGRAM_API_KEY) {
   throw new Error("Please define a Telegram API key.");
 }

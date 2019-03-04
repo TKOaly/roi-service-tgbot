@@ -4,7 +4,7 @@ import { promisify } from "util";
 import { getJobs } from "./services/JobService";
 
 import _ from "lodash";
-import { logger } from "./logger";
+import { logger } from "./Logger";
 import { Job } from "./models/Models";
 import { isJob, isString } from "./Validators";
 
