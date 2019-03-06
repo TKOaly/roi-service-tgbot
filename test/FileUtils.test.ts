@@ -98,13 +98,13 @@ describe("FileUtils", () => {
       done();
     });
 
-    it("If more than 5 new jobs are available, return an empty array (spam safeguard)", (done) => {
+    it("If more than 50 new jobs are available, return an empty array (spam safeguard)", (done) => {
       const diff = jobDifference(jobs6Local, jobs6Api);
       expect(diff).to.eql([]);
       done();
     });
 
-    it("If more than 5 jobs are deleted, return an empty array (spam safeguard)", (done) => {
+    it("If more than 50 jobs are deleted, return an empty array (spam safeguard)", (done) => {
       const diff = jobDifference(jobs7Local, jobs7Api);
       expect(diff).to.eql([]);
       done();

@@ -76,7 +76,7 @@ export const jobDifference = (existingJobs: Job[], fetchedJobs: Job[]) => {
   const diff = _.differenceWith(fetchedJobs, existingJobs, (job1, job2) => {
     return job1.id === job2.id;
   });
-  const thres = 5;
+  const thres = 50;
   if (diff.length >= thres) {
     logger.warn(
       `jobDifference(): Detected ${thres} or more changes in the job diff -

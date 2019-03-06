@@ -394,42 +394,23 @@ export const jobs5Api: Job[] = [
 // ========== Test case 6 ==========
 
 export const jobs6Local: Job[] = [{ ...generateJob(1) }];
-export const jobs6Api: Job[] = [
-  { ...generateJob(1) },
-  { ...generateJob(2) },
-  { ...generateJob(3) },
-  { ...generateJob(4) },
-  { ...generateJob(5) },
-  { ...generateJob(6) },
-];
+export const jobs6Api: Job[] = Array.from(Array(51), (d, i) => ({
+  ...generateJob(i + 1),
+}));
 
 // ========== Test case 7 ==========
 
-export const jobs7Local: Job[] = [
-  { ...generateJob(1) },
-  { ...generateJob(2) },
-  { ...generateJob(3) },
-  { ...generateJob(4) },
-  { ...generateJob(5) },
-  { ...generateJob(6) },
-];
+export const jobs7Local: Job[] = Array.from(Array(51), (d, i) => ({
+  ...generateJob(i + 1),
+}));
 export const jobs7Api: Job[] = [{ ...generateJob(1) }];
 
 // ========== Test case 8 ==========
 
-export const jobs8Local: Job[] = [
-  { ...generateJob(1) },
-  { ...generateJob(2) },
-  { ...generateJob(3) },
-  { ...generateJob(4) },
-  { ...generateJob(5) },
-];
+export const jobs8Local: Job[] = Array.from(Array(5), (d, i) => ({
+  ...generateJob(i + 1),
+}));
 
-export const jobs8Api: Job[] = [
-  { ...generateJob(1) },
-  { ...generateJob(2) },
-  { ...generateJob(3) },
-  { ...generateJob(4) },
-  { ...generateJob(5) },
-  { ...generateJob(6) },
-];
+export const jobs8Api: Job[] = Array.from(Array(6), (d, i) => ({
+  ...generateJob(i + 1),
+}));
