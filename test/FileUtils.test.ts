@@ -17,6 +17,7 @@ import {
   readFileAsync,
   writeFileAsync,
 } from "../src/FileUtils";
+import { generateJob } from "../src/MessageUtils";
 import {
   firstNewJob4,
   jobs1Api,
@@ -37,7 +38,6 @@ import {
   jobs8Local,
   newJob2,
   secondNewJob4,
-  tmpJob,
 } from "./JobData";
 
 const validIds = join(__dirname, "files", "testChatIds.json");
@@ -186,7 +186,7 @@ describe("FileUtils", () => {
       mock.onGet("jobs.json").reply(200, jobs8Api);
       // Get new Job postings
       const difference = await getNewJobPostings(tmpTestFile);
-      expect(difference).to.eql([tmpJob(6)]);
+      expect(difference).to.eql([generateJob(6)]);
     });
     it("Returns an empty array if malformed jobs are returned from the backend", async () => {
       const mock = new MockAdapter(axios);

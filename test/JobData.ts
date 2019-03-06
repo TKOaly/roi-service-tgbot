@@ -1,3 +1,4 @@
+import { generateJob } from "../src/MessageUtils";
 import { Job } from "../src/models/Models";
 
 // ========== Test case 1 ==========
@@ -392,70 +393,43 @@ export const jobs5Api: Job[] = [
 
 // ========== Test case 6 ==========
 
-export const tmpJob = (id: number) => ({
-  id,
-  company: {
-    id: 1,
-    name: "Test company",
-    logo: "test_company.png",
-    sponsored: true,
-    website: "example.com",
-    created_at: "2019-01-01 13:00:00",
-    updated_at: "2019-01-01 13:00:00",
-  },
-  description: "Job desc",
-  title: "Test job " + id,
-  url: "example.com/job_" + id,
-  begin: "2019-01-01 13:00:00",
-  created_at: "2019-01-01 13:00:00",
-  end: null,
-  tags: [
-    {
-      id: 1,
-      created_at: "2019-01-01 13:00:00",
-      name: "devops",
-      updated_at: "2019-01-01 13:00:00",
-    },
-  ],
-});
-
-export const jobs6Local: Job[] = [{ ...tmpJob(1) }];
+export const jobs6Local: Job[] = [{ ...generateJob(1) }];
 export const jobs6Api: Job[] = [
-  { ...tmpJob(1) },
-  { ...tmpJob(2) },
-  { ...tmpJob(3) },
-  { ...tmpJob(4) },
-  { ...tmpJob(5) },
-  { ...tmpJob(6) },
+  { ...generateJob(1) },
+  { ...generateJob(2) },
+  { ...generateJob(3) },
+  { ...generateJob(4) },
+  { ...generateJob(5) },
+  { ...generateJob(6) },
 ];
 
 // ========== Test case 7 ==========
 
 export const jobs7Local: Job[] = [
-  { ...tmpJob(1) },
-  { ...tmpJob(2) },
-  { ...tmpJob(3) },
-  { ...tmpJob(4) },
-  { ...tmpJob(5) },
-  { ...tmpJob(6) },
+  { ...generateJob(1) },
+  { ...generateJob(2) },
+  { ...generateJob(3) },
+  { ...generateJob(4) },
+  { ...generateJob(5) },
+  { ...generateJob(6) },
 ];
-export const jobs7Api: Job[] = [{ ...tmpJob(1) }];
+export const jobs7Api: Job[] = [{ ...generateJob(1) }];
 
 // ========== Test case 8 ==========
 
 export const jobs8Local: Job[] = [
-  { ...tmpJob(1) },
-  { ...tmpJob(2) },
-  { ...tmpJob(3) },
-  { ...tmpJob(4) },
-  { ...tmpJob(5) },
+  { ...generateJob(1) },
+  { ...generateJob(2) },
+  { ...generateJob(3) },
+  { ...generateJob(4) },
+  { ...generateJob(5) },
 ];
 
 export const jobs8Api: Job[] = [
-  { ...tmpJob(1) },
-  { ...tmpJob(2) },
-  { ...tmpJob(3) },
-  { ...tmpJob(4) },
-  { ...tmpJob(5) },
-  { ...tmpJob(6) },
+  { ...generateJob(1) },
+  { ...generateJob(2) },
+  { ...generateJob(3) },
+  { ...generateJob(4) },
+  { ...generateJob(5) },
+  { ...generateJob(6) },
 ];

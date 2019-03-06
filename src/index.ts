@@ -11,6 +11,7 @@ import {
   jobFile,
 } from "./FileUtils";
 import { logger } from "./Logger";
+import { generateJob, generateMessage } from "./MessageUtils";
 
 if (!process.env.TELEGRAM_API_KEY) {
   throw new Error("Please define a Telegram API key.");
@@ -26,10 +27,24 @@ const app = async (telegramApiKey: string) => {
       polling: true,
     });
 
-    bot.onText(/^\/chatId$/, (msg, match) => {
+    bot.onText(/^\/getchatid$/, (msg, match) => {
       const chatId = msg.chat.id;
       bot.sendMessage(chatId, "Your ChatID is: " + chatId);
     });
+
+    // For debugging
+    if (process.env.NODE_ENV === "development") {
+      bot.onText(/^\/testbroadcast$/, (msg, match) => {
+        const chatId = msg.chat.id;
+        bot.sendMessage(
+          chatId,
+          generateMessage([generateJob(1, true), generateJob(2)]),
+          {
+            parse_mode: "Markdown",
+          },
+        );
+      });
+    }
 
     const exists = await fileExistsAsync(chatIdFile);
     if (!exists) {
