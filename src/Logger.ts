@@ -1,3 +1,4 @@
+import { join } from "path";
 import winston from "winston";
 
 const transports =
@@ -9,12 +10,12 @@ const transports =
       ]
     : [
         new winston.transports.File({
-          filename: "error.log",
+          filename: join("logs", "error.log"),
           level: "error",
           maxsize: 500000,
         }),
         new winston.transports.File({
-          filename: "combined.log",
+          filename: join("logs", "combined.log"),
           maxsize: 500000,
         }),
         new winston.transports.Console({
