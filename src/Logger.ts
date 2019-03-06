@@ -1,33 +1,31 @@
-import { join } from "path";
 import winston from "winston";
 
 const transports =
   process.env.NODE_ENV === "test"
-    ? [
-        new winston.transports.Console({
-          format: winston.format.simple(),
-        }),
-      ]
+    ? [new winston.transports.Console()]
     : [
         new winston.transports.File({
-          filename: join("logs", "error.log"),
+          filename: "error.log",
           level: "error",
           maxsize: 500000,
+          dirname: "logs",
         }),
         new winston.transports.File({
-          filename: join("logs", "combined.log"),
+          filename: "combined.log",
           maxsize: 500000,
+          dirname: "logs",
         }),
-        new winston.transports.Console({
-          format: winston.format.simple(),
-        }),
+        new winston.transports.Console(),
       ];
 
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
+    winston.format.metadata(),
     winston.format.timestamp(),
-    winston.format.json(),
+    winston.format.printf(
+      (info) => `${info.timestamp} ${info.level}: ${info.message} (metadata: ${JSON.stringify(info.metadata)})`,
+    ),
   ),
   transports,
 });
