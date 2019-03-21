@@ -64,8 +64,27 @@ export const getJobsFromWeek = (jobs: Job[], time: moment.Moment) => {
     }
     return between;
   });
-  return [...filteredJobs];
+  const availableJobs = removeExpiredJobs([...filteredJobs], moment(time));
+  return availableJobs;
 };
 
 // TODO: Implement sorting
 export const sortJobs = (jobA: Job, jobB: Job) => -1;
+
+export const removeExpiredJobs = (
+  jobs: Job[],
+  momentInstance: moment.Moment,
+) => [
+  ...jobs.filter((job) => {
+    // If no ending date is set, return as default
+    if (job.end === null) {
+      return true;
+    }
+    // If the ending date is same or before the current date, filter the job out
+    if (moment(job.end).isSameOrBefore(momentInstance)) {
+      return false;
+    }
+    // In other cases, return as default
+    return true;
+  }),
+];

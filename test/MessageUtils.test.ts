@@ -55,7 +55,7 @@ const job2: Job = {
   url: "example.com/job_2",
   begin: "2019-01-01 12:00:00",
   created_at: "2019-01-01 12:00:00",
-  end: "2019-01-27 12:00:00",
+  end: "2019-02-27 12:00:00",
   tags: [
     {
       id: 1,
@@ -86,13 +86,15 @@ describe("MessageUtils", () => {
   });
   describe("canApply()", () => {
     it("Formats 'can apply' correctly", (done) => {
-      const apply = canApply(job1);
+      const mockDate = moment();
+      const apply = canApply(job1, mockDate);
       expect(apply).to.equal("Applications accepted until further notice");
       done();
     });
     it("Formats 'can apply' correctly", (done) => {
-      const apply = canApply(job2);
-      expect(apply).to.equal("Apply before: 2019-01-27 12:00:00");
+      const mockDate = moment("2019-01-25 12:10:00");
+      const apply = canApply(job2, mockDate);
+      expect(apply).to.equal("Apply before: 2019-02-27 12:00:00 (33.0 day(s) left)");
       done();
     });
   });
@@ -112,10 +114,10 @@ describe("MessageUtils", () => {
   });
   describe("generateMessage()", () => {
     it("Generates Job listing correctly", (done) => {
-      const mockDate = moment("2019-03-21 12:00:00");
+      const mockDate = moment("2019-02-01 12:00:00");
       const msg = generateMessage([job1, job2], mockDate);
       expect(msg).to.equal(
-        "New jobs that have been added between *2019-03-11 00:00:00* and *2019-03-17 23:59:59*" +
+        "New career opportunities on the job board!" +
           "\r\n" +
           "\r\n" +
           "*Test company - Job title*" +
@@ -131,7 +133,7 @@ describe("MessageUtils", () => {
           "\r\n" +
           "Published on: 2019-01-01 12:00:00" +
           "\r\n" +
-          "Apply before: 2019-01-27 12:00:00" +
+          "Apply before: 2019-02-27 12:00:00 (26.0 day(s) left)" +
           "\r\n" +
           "https://jobs.tko-aly.fi/jobs/22" +
           "\r\n",

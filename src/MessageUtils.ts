@@ -10,25 +10,27 @@ import { Job } from "./models/Models";
  */
 export const generateMessage = (jobs: Job[], currentDate: moment.Moment) => {
   let str = "";
-  str += `New jobs that have been added between *${moment(currentDate)
-    .subtract("1", "week")
-    .startOf("isoWeek")
-    .format("YYYY-MM-DD HH:mm:ss")}* and *${moment(currentDate)
-    .subtract("1", "week")
-    .endOf("isoWeek")
-    .format("YYYY-MM-DD HH:mm:ss")}*\r\n`;
+  str += `New career opportunities on the job board!\r\n`;
   jobs.forEach((job) => {
     str += `\r\n${jobTitle(job, true)}\r\n${publishedDate(
       job.created_at,
-    )}\r\n${canApply(job)}\r\n${jobUrl(job)}\r\n`;
+    )}\r\n${canApply(job, currentDate)}\r\n${jobUrl(job)}\r\n`;
   });
   return str;
 };
 
-export const canApply = (job: Job) =>
+export const canApply = (job: Job, momentInstance: moment.Moment) =>
   job.end !== null
-    ? "Apply before: " + moment(job.end).format("YYYY-MM-DD HH:mm:ss")
+    ? `Apply before: ${moment(job.end).format(
+        "YYYY-MM-DD HH:mm:ss",
+      )} (${daysLeft(job.end, momentInstance)} day(s) left)`
     : "Applications accepted until further notice";
+
+export const daysLeft = (date: string, momentInstance: moment.Moment, precision = 1) =>
+  moment
+    .duration(moment(date).diff(momentInstance))
+    .asDays()
+    .toFixed(precision);
 
 export const jobUrl = (job: Job) =>
   url.resolve("https://jobs.tko-aly.fi/", ["jobs", Number(job.id)].join("/"));
