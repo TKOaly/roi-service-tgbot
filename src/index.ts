@@ -6,7 +6,7 @@ import moment from "moment";
 import "moment/locale/fi";
 
 import TelegramBot from "node-telegram-bot-api";
-import { chatIdFile } from "./Constats";
+import { chatIdFile } from "./Constants";
 import { fileExistsAsync, getChatIds, getNewJobPostings } from "./FileUtils";
 import { logger } from "./Logger";
 import { generateJob, generateMessage } from "./MessageUtils";

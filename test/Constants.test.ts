@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import "mocha";
-import { chatIdFile } from "../src/Constats";
+import { chatIdFile } from "../src/Constants";
 
 describe("Constants", () => {
   it("Chat ID file is set correctly", (done) => {
