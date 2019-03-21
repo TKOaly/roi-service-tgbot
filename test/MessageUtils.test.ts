@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import "mocha";
+import "moment/locale/fi";
 import {
   canApply,
   generateJob,
@@ -126,7 +127,7 @@ describe("MessageUtils", () => {
   });
   describe("generateJob()", () => {
     it("Generates job correctly (no end date)", (done) => {
-      const job = generateJob(55);
+      const job = generateJob(55, "2019-01-01 13:00:00");
       expect(job).to.eql({
         id: 55,
         company: {
@@ -156,7 +157,7 @@ describe("MessageUtils", () => {
       done();
     });
     it("Generates job correctly (end date set)", (done) => {
-      const job = generateJob(55, true);
+      const job = generateJob(55, "2019-01-01 13:00:00", true);
       expect(job).to.eql({
         id: 55,
         company: {
@@ -173,7 +174,7 @@ describe("MessageUtils", () => {
         url: "example.com/job_" + 55,
         begin: "2019-01-01 13:00:00",
         created_at: "2019-01-01 13:00:00",
-        end: "2019-01-27 13:00:00",
+        end: "2019-01-15 13:00:00",
         tags: [
           {
             id: 1,

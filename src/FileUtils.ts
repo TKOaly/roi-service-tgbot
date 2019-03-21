@@ -1,15 +1,12 @@
 import fs from "fs";
-import { join } from "path";
 import { promisify } from "util";
 import { getJobs } from "./services/JobService";
 
 import _ from "lodash";
+import moment from "moment";
 import { logger } from "./Logger";
 import { Job } from "./models/Models";
 import { isJob, isString } from "./Validators";
-
-export const jobFile = join("src", "data", "jobs.json");
-export const chatIdFile = join("src", "data", "chats.json");
 
 export const writeFileAsync = promisify(fs.writeFile);
 export const readFileAsync = promisify(fs.readFile);
@@ -32,10 +29,10 @@ export const parseChatIds = (data: any) => {
 };
 
 /**
- * Fetches job data from the API, then compares the returned result with a locally cached version.
+ * Fetches job data from the API, then returns those job postings that have been created last week
  * @param jobFilePath Job file location
  */
-export const getNewJobPostings = async (jobFilePath: string) => {
+export const getNewJobPostings = async (momentInstance: moment.Moment) => {
   // Fetch jobs from the back-end
   const jobs = await getJobs();
   if (!jobs.every(isJob)) {
@@ -44,81 +41,19 @@ export const getNewJobPostings = async (jobFilePath: string) => {
     );
     return [];
   }
-  // Read the local job file
-  const existingJobs = await readFileAsync(jobFilePath);
-  const parsed = JSON.parse(existingJobs.toString());
-  // Check if the parsed data is an array
-  if (!Array.isArray(parsed)) {
-    logger.error(
-      "getNewJobPostings(): Malformed array returned from the back-end",
-    );
-    return [];
-  }
-  // Validate the parsed data to make sure that it matches the API.
-  if (!parsed.every(isJob)) {
-    logger.error(
-      "getNewJobPostings(): Malformed data returned from the back-end",
-    );
-    return [];
-  }
-  // Do a diff
-  const diff = jobDifference(parsed, jobs);
-  return diff;
+  // Get the time that was one week ago
+  const weekBefore = momentInstance.subtract(1, "week");
+  // Filter out jobs that were added last week
+  const filtered = getJobsFromWeek(jobs, weekBefore);
+  return filtered;
 };
 
-/**
- * Calculates the job difference.
- * @param existingJobs Job set 1
- * @param fetchedJobs Job set 2
- */
-export const jobDifference = (existingJobs: Job[], fetchedJobs: Job[]) => {
-  // Use Lodash's difference() function to calculate the difference
-  const diff = _.differenceWith(fetchedJobs, existingJobs, (job1, job2) => {
-    return job1.id === job2.id;
+export const getJobsFromWeek = (jobs: Job[], time: moment.Moment) => {
+  const start = moment(time.toISOString()).startOf("isoWeek");
+  const end = moment(time.toISOString()).endOf("isoWeek");
+  const filteredJobs = jobs.filter((job) => {
+    const jobTime = moment(job.created_at);
+    return jobTime.isAfter(start) && jobTime.isBefore(end);
   });
-  const thres = 50;
-  if (diff.length >= thres) {
-    logger.warn(
-      `jobDifference(): Detected ${thres} or more changes in the job diff -
-       preventing broadcasting those as a spam prevention. Diff count: ${
-         diff.length
-       }`,
-    );
-    return [];
-  }
-  if (diff.length > 0) {
-    logger.info(
-      `jobDifference(): Detected new jobs with IDs ${diff
-        .map((obj) => obj.id)
-        .join(",")}.`,
-    );
-  }
-  return diff;
-};
-
-/**
- * Fetches the jobs from the API using HTTP and writes them to a file.
- * @param outputFile Output file to write the new job data.
- * @param axiosInstance Custom Axios instance
- */
-export const fetchNewJobPostings = async (outputFile: string) => {
-  logger.info("fetchNewJobPostings(): Fetching jobs", {
-    jobs_backend_url: process.env.JOBS_BACKEND_URL,
-  });
-  const jobs = await getJobs();
-  if (!jobs.every(isJob)) {
-    logger.error(
-      "fetchNewJobPostings(): Malformed jobs returned from the back-end",
-      {
-        jobs_backend_url: process.env.JOBS_BACKEND_URL,
-      },
-    );
-    return;
-  }
-  logger.info("fetchNewJobPostings(): Fetched jobs", {
-    jobs_backend_url: process.env.JOBS_BACKEND_URL,
-  });
-  logger.info("fetchNewJobPostings(): Writing jobs to file", { outputFile });
-  await writeFileAsync(outputFile, JSON.stringify(jobs));
-  logger.info("fetchNewJobPostings(): Wrote jobs to file", { outputFile });
+  return [...filteredJobs];
 };

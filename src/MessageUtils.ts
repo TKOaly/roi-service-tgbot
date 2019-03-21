@@ -1,3 +1,4 @@
+import moment from "moment";
 import url from "url";
 import { Job } from "./models/Models";
 
@@ -29,7 +30,11 @@ export const jobTitle = (job: Job, bold?: boolean) =>
     ? `*${job.company.name} - ${job.title}*`
     : `${job.company.name} - ${job.title}`;
 
-export const generateJob = (id: number, end?: boolean) => ({
+export const generateJob = (
+  id: number,
+  localDate: string,
+  end?: boolean,
+): Job => ({
   id,
   company: {
     id: 1,
@@ -37,21 +42,26 @@ export const generateJob = (id: number, end?: boolean) => ({
     logo: "test_company.png",
     sponsored: true,
     website: "example.com",
-    created_at: "2019-01-01 13:00:00",
-    updated_at: "2019-01-01 13:00:00",
+    created_at: localDate,
+    updated_at: localDate,
   },
   description: "Job desc",
   title: "Test job " + id,
   url: "example.com/job_" + id,
-  begin: "2019-01-01 13:00:00",
-  created_at: "2019-01-01 13:00:00",
-  end: end && Boolean(end) === true ? "2019-01-27 13:00:00" : null,
+  begin: localDate,
+  created_at: localDate,
+  end:
+    end && Boolean(end) === true
+      ? moment(localDate)
+          .add(2, "weeks")
+          .format("YYYY-MM-DD HH:mm:ss")
+      : null,
   tags: [
     {
       id: 1,
-      created_at: "2019-01-01 13:00:00",
+      created_at: localDate,
       name: "devops",
-      updated_at: "2019-01-01 13:00:00",
+      updated_at: localDate,
     },
   ],
 });

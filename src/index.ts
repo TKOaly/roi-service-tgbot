@@ -2,15 +2,13 @@ import dotenv from "dotenv";
 import cron from "node-cron";
 dotenv.config();
 
+import moment from "moment";
+import "moment/locale/fi";
+
+moment.locale("fi/fi");
 import TelegramBot from "node-telegram-bot-api";
-import {
-  chatIdFile,
-  fetchNewJobPostings,
-  fileExistsAsync,
-  getChatIds,
-  getNewJobPostings,
-  jobFile,
-} from "./FileUtils";
+import { chatIdFile } from "./Constats";
+import { fileExistsAsync, getChatIds, getNewJobPostings } from "./FileUtils";
 import { logger } from "./Logger";
 import { generateJob, generateMessage } from "./MessageUtils";
 
@@ -26,8 +24,6 @@ const app = async (telegramApiKey: string) => {
     NODE_ENV: process.env.NODE_ENV,
   });
   try {
-    // Sync jobs.json
-    await fetchNewJobPostings(jobFile);
     const bot = new TelegramBot(telegramApiKey, {
       polling: true,
     });
@@ -45,7 +41,10 @@ const app = async (telegramApiKey: string) => {
         const chatId = msg.chat.id;
         bot.sendMessage(
           chatId,
-          generateMessage([generateJob(1, true), generateJob(2)]),
+          generateMessage([
+            generateJob(1, "2019-01-01 12:00:00", true),
+            generateJob(2, "2019-01-02 15:00:00"),
+          ]),
           {
             parse_mode: "Markdown",
           },
@@ -72,7 +71,7 @@ const app = async (telegramApiKey: string) => {
 const scheduledTask = async (bot: TelegramBot) => {
   logger.info("scheduledTask(): Starting");
   // Checks for updated jobs
-  const newJobs = await getNewJobPostings(jobFile);
+  const newJobs = await getNewJobPostings(moment());
   // If there are new job postings available
   if (newJobs.length > 0) {
     // Get available Chat IDs
@@ -94,8 +93,6 @@ const scheduledTask = async (bot: TelegramBot) => {
   } else {
     logger.info("scheduledTask(): No new jobs at the moment.");
   }
-  // Fetch new job postings (and save them locally)
-  await fetchNewJobPostings(jobFile);
 };
 
 app(process.env.TELEGRAM_API_KEY);

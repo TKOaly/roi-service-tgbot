@@ -1,7 +1,7 @@
 process.env.NODE_ENV = "test";
-
 import { expect } from "chai";
 import "mocha";
+import "moment/locale/fi";
 import {
   isBoolean,
   isCompany,
