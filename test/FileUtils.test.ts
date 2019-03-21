@@ -16,6 +16,7 @@ import {
   getNewJobPostings,
   parseChatIds,
   readFileAsync,
+  sortJobs,
   writeFileAsync,
 } from "../src/FileUtils";
 import { generateJob } from "../src/MessageUtils";
@@ -123,8 +124,105 @@ describe("FileUtils", () => {
         moment("2019-02-26 04:00:00"),
       );
       // This should return one job from 2019-03-02
-      expect(difference).to.eql([generateJob(1, "2019-03-02 12:00:00", true)]);
+      expect(difference).to.eql([
+        generateJob(1, "2019-03-02 12:00:00", "2019-03-02 12:00:00"),
+      ]);
       done();
+    });
+  });
+  describe("sortJobs()", () => {
+    it("Sorts jobs correctly", async () => {
+      const momentInstance = moment("2019-03-21 21:22:20");
+      const jobs = [
+        // Deadline in 26 hours
+        generateJob(
+          3,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("26", "hours")
+            .toISOString(),
+        ),
+        // Deadline in 22 hours
+        generateJob(
+          4,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("22", "hours")
+            .toISOString(),
+        ),
+        // Deadline in 12 hours
+        generateJob(
+          2,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("12", "hours")
+            .toISOString(),
+        ),
+        // Deadline in 3 days
+        generateJob(
+          5,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("3", "days")
+            .toISOString(),
+        ),
+        // Deadline not set
+        generateJob(6, moment(momentInstance).toISOString()),
+        // Deadline in 12 minutes
+        generateJob(
+          1,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("12", "minutes")
+            .toISOString(),
+        ),
+      ];
+      const expected = [
+        // Deadline not set
+        generateJob(6, moment(momentInstance).toISOString()),
+        // Deadline in 3 days
+        generateJob(
+          5,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("3", "days")
+            .toISOString(),
+        ),
+        // Deadline in 26 hours
+        generateJob(
+          3,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("26", "hours")
+            .toISOString(),
+        ),
+
+        // Deadline in 22 hours
+        generateJob(
+          4,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("22", "hours")
+            .toISOString(),
+        ),
+        // Deadline in 12 hours
+        generateJob(
+          2,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("12", "hours")
+            .toISOString(),
+        ),
+        // Deadline in 12 minutes
+        generateJob(
+          1,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("12", "minutes")
+            .toISOString(),
+        ),
+      ];
+      expect([...jobs.sort(sortJobs)]).to.eql([...expected]);
     });
   });
 });

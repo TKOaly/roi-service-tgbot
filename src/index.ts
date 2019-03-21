@@ -7,7 +7,12 @@ import "moment/locale/fi";
 
 import TelegramBot from "node-telegram-bot-api";
 import { chatIdFile } from "./Constants";
-import { fileExistsAsync, getChatIds, getNewJobPostings } from "./FileUtils";
+import {
+  fileExistsAsync,
+  getChatIds,
+  getNewJobPostings,
+  sortJobs,
+} from "./FileUtils";
 import { logger } from "./Logger";
 import { generateJob, generateMessage } from "./MessageUtils";
 
@@ -38,30 +43,55 @@ const app = async (telegramApiKey: string) => {
       // Sends a test broadcast
       bot.onText(/^\/testbroadcast$/, (msg, match) => {
         const chatId = msg.chat.id;
+        const jobs = [
+          // Deadline in 26 hours
+          generateJob(
+            3,
+            moment().toISOString(),
+            moment()
+              .add("26", "hours")
+              .toISOString(),
+          ),
+          // Deadline in 22 hours
+          generateJob(
+            4,
+            moment().toISOString(),
+            moment()
+              .add("22", "hours")
+              .toISOString(),
+          ),
+          // Deadline in 12 hours
+          generateJob(
+            2,
+            moment().toISOString(),
+            moment()
+              .add("12", "hours")
+              .toISOString(),
+          ),
+          // Deadline in 22 hours
+          generateJob(
+            5,
+            moment().toISOString(),
+            moment()
+              .add("3", "days")
+              .toISOString(),
+          ),
+          // Deadline not set
+          generateJob(6, moment().toISOString()),
+          // Deadline in 12 minutes
+          generateJob(
+            1,
+            moment().toISOString(),
+            moment()
+              .add("12", "minutes")
+              .toISOString(),
+          ),
+        ].sort(sortJobs);
         bot.sendMessage(
           chatId,
           generateMessage(
-            [
-              generateJob(
-                3,
-                moment()
-                  .subtract("2", "hours")
-                  .toISOString(),
-                true,
-              ),
-              generateJob(
-                2,
-                moment()
-                  .subtract("1", "day")
-                  .toISOString(),
-              ),
-              generateJob(
-                1,
-                moment()
-                  .subtract("1", "week")
-                  .toISOString(),
-              ),
-            ],
+            jobs,
+            // Current date
             moment(),
           ),
           {
@@ -106,7 +136,7 @@ const scheduledTask = async (bot: TelegramBot) => {
           logger.info("scheduledTask(): Sending job info to chat", { chatId });
           return bot.sendMessage(
             chatId,
-            generateMessage(newJobs, currentDate),
+            generateMessage(newJobs.sort(sortJobs), currentDate),
             {
               parse_mode: "Markdown",
             },
