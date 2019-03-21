@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import "mocha";
+import moment from "moment";
 import "moment/locale/fi";
 import {
   canApply,
@@ -7,6 +8,7 @@ import {
   generateMessage,
   jobTitle,
   jobUrl,
+  publishedDate,
 } from "../src/MessageUtils";
 import { Job } from "../src/models/Models";
 
@@ -90,7 +92,14 @@ describe("MessageUtils", () => {
     });
     it("Formats 'can apply' correctly", (done) => {
       const apply = canApply(job2);
-      expect(apply).to.equal("Apply before 2019-01-27 12:00:00");
+      expect(apply).to.equal("Apply before: 2019-01-27 12:00:00");
+      done();
+    });
+  });
+  describe("publishedDate()", () => {
+    it("Formats 'published date' correctly", (done) => {
+      const apply = publishedDate("2019-02-27 12:34:56");
+      expect(apply).to.equal("Published on: 2019-02-27 12:34:56");
       done();
     });
   });
@@ -103,12 +112,15 @@ describe("MessageUtils", () => {
   });
   describe("generateMessage()", () => {
     it("Generates Job listing correctly", (done) => {
-      const msg = generateMessage([job1, job2]);
+      const mockDate = moment("2019-03-21 12:00:00");
+      const msg = generateMessage([job1, job2], mockDate);
       expect(msg).to.equal(
-        "*New jobs:*" +
+        "New jobs that have been added between *2019-03-11 00:00:00* and *2019-03-17 23:59:59*" +
           "\r\n" +
           "\r\n" +
           "*Test company - Job title*" +
+          "\r\n" +
+          "Published on: 2019-01-01 12:00:00" +
           "\r\n" +
           "Applications accepted until further notice" +
           "\r\n" +
@@ -117,7 +129,9 @@ describe("MessageUtils", () => {
           "\r\n" +
           "*Test company 2 - Job title*" +
           "\r\n" +
-          "Apply before 2019-01-27 12:00:00" +
+          "Published on: 2019-01-01 12:00:00" +
+          "\r\n" +
+          "Apply before: 2019-01-27 12:00:00" +
           "\r\n" +
           "https://jobs.tko-aly.fi/jobs/22" +
           "\r\n",

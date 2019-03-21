@@ -44,16 +44,28 @@ export const getNewJobPostings = async (momentInstance: moment.Moment) => {
   // Get the time that was one week ago
   const weekBefore = momentInstance.subtract(1, "week");
   // Filter out jobs that were added last week
-  const filtered = getJobsFromWeek(jobs, weekBefore);
+  const filtered = getJobsFromWeek(jobs, weekBefore).sort(sortJobs);
   return filtered;
 };
 
 export const getJobsFromWeek = (jobs: Job[], time: moment.Moment) => {
   const start = moment(time.toISOString()).startOf("isoWeek");
   const end = moment(time.toISOString()).endOf("isoWeek");
+  logger.info(
+    `getJobsFromWeek(): Checking for new jobs between ${start.toISOString()} - ${end.toISOString()}`,
+  );
   const filteredJobs = jobs.filter((job) => {
     const jobTime = moment(job.created_at);
-    return jobTime.isAfter(start) && jobTime.isBefore(end);
+    const between = jobTime.isAfter(start) && jobTime.isBefore(end);
+    if (between) {
+      logger.info(
+        `${jobTime.toISOString()} is between ${start.toISOString()} and ${end.toISOString()}`,
+      );
+    }
+    return between;
   });
   return [...filteredJobs];
 };
+
+// TODO: Implement sorting
+export const sortJobs = (jobA: Job, jobB: Job) => -1;

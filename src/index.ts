@@ -5,7 +5,6 @@ dotenv.config();
 import moment from "moment";
 import "moment/locale/fi";
 
-moment.locale("fi/fi");
 import TelegramBot from "node-telegram-bot-api";
 import { chatIdFile } from "./Constats";
 import { fileExistsAsync, getChatIds, getNewJobPostings } from "./FileUtils";
@@ -41,10 +40,30 @@ const app = async (telegramApiKey: string) => {
         const chatId = msg.chat.id;
         bot.sendMessage(
           chatId,
-          generateMessage([
-            generateJob(1, "2019-01-01 12:00:00", true),
-            generateJob(2, "2019-01-02 15:00:00"),
-          ]),
+          generateMessage(
+            [
+              generateJob(
+                3,
+                moment()
+                  .subtract("2", "hours")
+                  .toISOString(),
+                true,
+              ),
+              generateJob(
+                2,
+                moment()
+                  .subtract("1", "day")
+                  .toISOString(),
+              ),
+              generateJob(
+                1,
+                moment()
+                  .subtract("1", "week")
+                  .toISOString(),
+              ),
+            ],
+            moment(),
+          ),
           {
             parse_mode: "Markdown",
           },
@@ -77,6 +96,7 @@ const scheduledTask = async (bot: TelegramBot) => {
     // Get available Chat IDs
     logger.info("scheduledTask(): Reading chat IDs to broadcast");
     const chatIds = await getChatIds(chatIdFile);
+    const currentDate = moment();
     // If there are chats that are configured, map them through
     if (chatIds.length > 0) {
       logger.info(`scheduledTask(): Detected ${newJobs.length} new jobs`);
@@ -84,9 +104,13 @@ const scheduledTask = async (bot: TelegramBot) => {
       await Promise.all(
         chatIds.map((chatId) => {
           logger.info("scheduledTask(): Sending job info to chat", { chatId });
-          return bot.sendMessage(chatId, generateMessage(newJobs), {
-            parse_mode: "Markdown",
-          });
+          return bot.sendMessage(
+            chatId,
+            generateMessage(newJobs, currentDate),
+            {
+              parse_mode: "Markdown",
+            },
+          );
         }),
       );
     }

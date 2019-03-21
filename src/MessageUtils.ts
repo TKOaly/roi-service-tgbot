@@ -1,25 +1,33 @@
 import moment from "moment";
+import "moment/locale/fi";
 import url from "url";
 import { Job } from "./models/Models";
 
 /**
  * Generates a formatted job message.
  * @param jobs Job array
+ * @param currentDate Current date. Parses the date and adds the time range to the title
  */
-export const generateMessage = (jobs: Job[]) => {
+export const generateMessage = (jobs: Job[], currentDate: moment.Moment) => {
   let str = "";
-  str += "*New jobs:*\r\n";
+  str += `New jobs that have been added between *${moment(currentDate)
+    .subtract("1", "week")
+    .startOf("isoWeek")
+    .format("YYYY-MM-DD HH:mm:ss")}* and *${moment(currentDate)
+    .subtract("1", "week")
+    .endOf("isoWeek")
+    .format("YYYY-MM-DD HH:mm:ss")}*\r\n`;
   jobs.forEach((job) => {
-    str += `\r\n${jobTitle(job, true)}\r\n${canApply(job)}\r\n${jobUrl(
-      job,
-    )}\r\n`;
+    str += `\r\n${jobTitle(job, true)}\r\n${publishedDate(
+      job.created_at,
+    )}\r\n${canApply(job)}\r\n${jobUrl(job)}\r\n`;
   });
   return str;
 };
 
 export const canApply = (job: Job) =>
   job.end !== null
-    ? "Apply before " + job.end
+    ? "Apply before: " + moment(job.end).format("YYYY-MM-DD HH:mm:ss")
     : "Applications accepted until further notice";
 
 export const jobUrl = (job: Job) =>
@@ -29,6 +37,9 @@ export const jobTitle = (job: Job, bold?: boolean) =>
   bold && bold === true
     ? `*${job.company.name} - ${job.title}*`
     : `${job.company.name} - ${job.title}`;
+
+export const publishedDate = (time: string) =>
+  `Published on: ${moment(time).format("YYYY-MM-DD HH:mm:ss")}`;
 
 export const generateJob = (
   id: number,
