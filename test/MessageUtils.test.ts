@@ -1,9 +1,12 @@
 import { expect } from "chai";
 import "mocha";
+import moment from "moment";
+import "moment/locale/fi";
 import {
   canApply,
   generateJob,
   generateMessage,
+  getDeadline,
   jobTitle,
   jobUrl,
 } from "../src/MessageUtils";
@@ -52,7 +55,7 @@ const job2: Job = {
   url: "example.com/job_2",
   begin: "2019-01-01 12:00:00",
   created_at: "2019-01-01 12:00:00",
-  end: "2019-01-27 12:00:00",
+  end: "2019-02-27 12:00:00",
   tags: [
     {
       id: 1,
@@ -67,29 +70,33 @@ describe("MessageUtils", () => {
   describe("jobTitle()", () => {
     it("Formats title correctly (bold)", (done) => {
       const title = jobTitle(job1, true);
-      expect(title).to.equal("*Test company - Job title*");
+      expect(title).to.equal("*Test company: Job title*");
       done();
     });
     it("Formats title correctly (non-bold) #1", (done) => {
       const title = jobTitle(job1, false);
-      expect(title).to.equal("Test company - Job title");
+      expect(title).to.equal("Test company: Job title");
       done();
     });
     it("Formats title correctly (non-bold) #2", (done) => {
       const title = jobTitle(job1);
-      expect(title).to.equal("Test company - Job title");
+      expect(title).to.equal("Test company: Job title");
       done();
     });
   });
   describe("canApply()", () => {
     it("Formats 'can apply' correctly", (done) => {
-      const apply = canApply(job1);
+      const mockDate = moment();
+      const apply = canApply(job1, mockDate);
       expect(apply).to.equal("Applications accepted until further notice");
       done();
     });
     it("Formats 'can apply' correctly", (done) => {
-      const apply = canApply(job2);
-      expect(apply).to.equal("Apply before 2019-01-27 12:00:00");
+      const mockDate = moment("2019-01-25 12:10:00");
+      const apply = canApply(job2, mockDate);
+      expect(apply).to.equal(
+        "Applications accepted until: 27.02.2019 (32 days remaining)",
+      );
       done();
     });
   });
@@ -102,21 +109,22 @@ describe("MessageUtils", () => {
   });
   describe("generateMessage()", () => {
     it("Generates Job listing correctly", (done) => {
-      const msg = generateMessage([job1, job2]);
+      const mockDate = moment("2019-02-01 12:00:00");
+      const msg = generateMessage([job1, job2], mockDate);
       expect(msg).to.equal(
-        "*New jobs:*" +
+        "New career opportunities on the job board!" +
           "\r\n" +
           "\r\n" +
-          "*Test company - Job title*" +
+          "*Test company: Job title*" +
           "\r\n" +
           "Applications accepted until further notice" +
           "\r\n" +
           "https://jobs.tko-aly.fi/jobs/1" +
           "\r\n" +
           "\r\n" +
-          "*Test company 2 - Job title*" +
+          "*Test company 2: Job title*" +
           "\r\n" +
-          "Apply before 2019-01-27 12:00:00" +
+          "Applications accepted until: 27.02.2019 (26 days remaining)" +
           "\r\n" +
           "https://jobs.tko-aly.fi/jobs/22" +
           "\r\n",
@@ -126,7 +134,7 @@ describe("MessageUtils", () => {
   });
   describe("generateJob()", () => {
     it("Generates job correctly (no end date)", (done) => {
-      const job = generateJob(55);
+      const job = generateJob(55, "2019-01-01 13:00:00");
       expect(job).to.eql({
         id: 55,
         company: {
@@ -156,7 +164,7 @@ describe("MessageUtils", () => {
       done();
     });
     it("Generates job correctly (end date set)", (done) => {
-      const job = generateJob(55, true);
+      const job = generateJob(55, "2019-01-01 13:00:00", "2019-01-15 13:00:00");
       expect(job).to.eql({
         id: 55,
         company: {
@@ -173,7 +181,7 @@ describe("MessageUtils", () => {
         url: "example.com/job_" + 55,
         begin: "2019-01-01 13:00:00",
         created_at: "2019-01-01 13:00:00",
-        end: "2019-01-27 13:00:00",
+        end: "2019-01-15 13:00:00",
         tags: [
           {
             id: 1,
@@ -184,6 +192,70 @@ describe("MessageUtils", () => {
         ],
       });
       done();
+    });
+  });
+  describe("daysLeft()", () => {
+    it("Returns 'Deadline today' correctly #1", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-08 12:01:00");
+      const res = getDeadline(deadline, today);
+      expect(res).to.equal("Deadline today");
+    });
+    it("Returns 'Deadline today' correctly #2", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-08 23:59:59");
+      const res = getDeadline(deadline, today);
+      expect(res).to.equal("Deadline today");
+    });
+    it("Returns 'Deadline today' correctly #3", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-09 00:00:00");
+      const res = getDeadline(deadline, today);
+      expect(res).to.not.equal("Deadline today");
+    });
+    it("Returns 'Deadline tomorrow' correctly #1", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-09 00:00:00");
+      const res = getDeadline(deadline, today);
+      expect(res).to.equal("Deadline tomorrow");
+    });
+    it("Returns 'Deadline tomorrow' correctly #2", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-09 12:00:00");
+      const res = getDeadline(deadline, today);
+      expect(res).to.equal("Deadline tomorrow");
+    });
+    it("Returns 'Deadline tomorrow' correctly #3", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-12 12:00:00");
+      const res = getDeadline(deadline, today);
+      expect(res).to.not.equal("Deadline today");
+    });
+    it("Returns '2 day(s) remaining' correctly #1", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-10 12:00:00");
+      const res = getDeadline(deadline, today);
+      expect(res).to.equal("2 days remaining");
+    });
+    it("Returns '2 day(s) remaining' correctly #2", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-10 12:00:10");
+      const res = getDeadline(deadline, today);
+      expect(res).to.equal("2 days remaining");
+    });
+    it("Returns '2 day(s) remaining' correctly #3", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-10 12:01:00");
+      const res = getDeadline(deadline, today);
+      // Uses flooring in the return value
+      expect(res).to.equal("2 days remaining");
+    });
+    it("Returns '3 day(s) remaining' correctly #1", () => {
+      const today = moment("2019-01-08 12:00:00");
+      const deadline = moment("2019-01-11 12:00:00");
+      const res = getDeadline(deadline, today);
+      // Uses flooring in the return value
+      expect(res).to.equal("3 days remaining");
     });
   });
 });

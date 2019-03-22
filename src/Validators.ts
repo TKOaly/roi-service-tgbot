@@ -2,14 +2,37 @@ import { Company, Job, Tag } from "./models/Models";
 
 export type Validator<T> = (x: unknown) => x is T;
 
+/**
+ * Checks if a value is a string.
+ * @param val Value
+ */
 export const isString: Validator<string> = (val): val is string =>
   typeof val === "string";
+
+/**
+ * Checks if a value is a number.
+ * @param val Value
+ */
 export const isNumber: Validator<number> = (val): val is number =>
   typeof val === "number";
+
+/**
+ * Checks if a value is a boolean.
+ * @param val Value
+ */
 export const isBoolean: Validator<boolean> = (val): val is boolean =>
   typeof val === "boolean";
+
+/**
+ * Checks if a value is null.
+ * @param val Value
+ */
 export const isNull: Validator<null> = (val): val is null => val === null;
 
+/**
+ * Checks if an object is a Tag.
+ * @param val Object
+ */
 export const isTag: Validator<Tag> = (val): val is Tag => {
   const tmp = val as Tag;
   if (
@@ -31,6 +54,10 @@ export const isTag: Validator<Tag> = (val): val is Tag => {
   return true;
 };
 
+/**
+ * Checks if an object is a Company.
+ * @param val Object
+ */
 export const isCompany: Validator<Company> = (val): val is Company => {
   const tmp = val as Company;
   if (
@@ -58,6 +85,10 @@ export const isCompany: Validator<Company> = (val): val is Company => {
   return true;
 };
 
+/**
+ * Checks if an object is a Validator.
+ * @param val Value
+ */
 export const isJob: Validator<Job> = (val): val is Job => {
   const {
     id,
