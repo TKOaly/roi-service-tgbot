@@ -8,8 +8,17 @@ import { logger } from "./Logger";
 import { Job } from "./models/Models";
 import { isJob, isString } from "./Validators";
 
+/**
+ * Writes a file asynchronously. Wrapped into a promise.
+ */
 export const writeFileAsync = promisify(fs.writeFile);
+/**
+ * Reads a file asynchronously. Wrapped into a promise.
+ */
 export const readFileAsync = promisify(fs.readFile);
+/**
+ *  Checks if a file exists asynchronously. Wrapped into a promise.
+ */
 export const fileExistsAsync = promisify(fs.exists);
 
 /**

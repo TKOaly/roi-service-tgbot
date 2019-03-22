@@ -2,8 +2,7 @@ import customAxios from "../CustomAxios";
 import { Job } from "../models/Models";
 
 /**
- * Returns all jobs from the backend.
- * @param customAxios Axios instance
+ * Returns all jobs from the back-end.
  */
 const getJobs = async () => {
   const jobs = await customAxios.withoutToken().get<Job[]>("jobs.json");

@@ -18,6 +18,9 @@ const transports =
         new winston.transports.Console(),
       ];
 
+/**
+ * Logger instance.
+ */
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(

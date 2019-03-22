@@ -1,3 +1,6 @@
+/**
+ * Company model.
+ */
 export interface Company {
   id: number;
   name: string;
@@ -8,6 +11,9 @@ export interface Company {
   logo: string | null;
 }
 
+/**
+ * Tag model.
+ */
 export interface Tag {
   id: number;
   name: string;
@@ -15,6 +21,9 @@ export interface Tag {
   updated_at: string;
 }
 
+/**
+ * Job model.
+ */
 export interface Job {
   id: number;
   title: string;
