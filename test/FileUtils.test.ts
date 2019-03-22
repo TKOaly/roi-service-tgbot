@@ -178,31 +178,12 @@ describe("FileUtils", () => {
         ),
       ];
       const expected = [
-        // Deadline not set
-        generateJob(6, moment(momentInstance).toISOString()),
-        // Deadline in 3 days
+        // Deadline in 12 minutes
         generateJob(
-          5,
+          1,
           moment(momentInstance).toISOString(),
           moment(momentInstance)
-            .add("3", "days")
-            .toISOString(),
-        ),
-        // Deadline in 26 hours
-        generateJob(
-          3,
-          moment(momentInstance).toISOString(),
-          moment(momentInstance)
-            .add("26", "hours")
-            .toISOString(),
-        ),
-
-        // Deadline in 22 hours
-        generateJob(
-          4,
-          moment(momentInstance).toISOString(),
-          moment(momentInstance)
-            .add("22", "hours")
+            .add("12", "minutes")
             .toISOString(),
         ),
         // Deadline in 12 hours
@@ -213,14 +194,32 @@ describe("FileUtils", () => {
             .add("12", "hours")
             .toISOString(),
         ),
-        // Deadline in 12 minutes
+        // Deadline in 22 hours
         generateJob(
-          1,
+          4,
           moment(momentInstance).toISOString(),
           moment(momentInstance)
-            .add("12", "minutes")
+            .add("22", "hours")
             .toISOString(),
         ),
+        // Deadline in 26 hours
+        generateJob(
+          3,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("26", "hours")
+            .toISOString(),
+        ),
+        // Deadline in 3 days
+        generateJob(
+          5,
+          moment(momentInstance).toISOString(),
+          moment(momentInstance)
+            .add("3", "days")
+            .toISOString(),
+        ),
+        // Deadline not set
+        generateJob(6, moment(momentInstance).toISOString()),
       ];
       expect([...jobs.sort(sortJobs)]).to.eql([...expected]);
     });

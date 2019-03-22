@@ -12,9 +12,7 @@ export const generateMessage = (jobs: Job[], currentDate: moment.Moment) => {
   let str = "";
   str += `New career opportunities on the job board!\r\n`;
   jobs.forEach((job) => {
-    str += `\r\n${jobTitle(job, true)}\r\n${publishedDate(
-      job.created_at,
-    )}\r\n${canApply(job, currentDate)}\r\n${jobUrl(job)}\r\n`;
+    str += `\r\n${jobTitle(job, true)}\r\n${canApply(job, currentDate)}\r\n${jobUrl(job)}\r\n`;
   });
   return str;
 };
@@ -22,7 +20,7 @@ export const generateMessage = (jobs: Job[], currentDate: moment.Moment) => {
 export const canApply = (job: Job, currentDate: moment.Moment) =>
   job.end !== null
     ? `Applications accepted until: ${moment(job.end).format(
-        "DD.MM.YYYY HH:mm:ss",
+        "DD.MM.YYYY",
       )} (${getDeadline(moment(job.end), currentDate)})`
     : "Applications accepted until further notice";
 
@@ -54,7 +52,7 @@ export const getDeadline = (
   ) {
     return "Deadline tomorrow";
   }
-  return `${Math.floor(left)} day(s) remaining`;
+  return `${Math.floor(left)} days remaining`;
 };
 
 /**
@@ -73,13 +71,6 @@ export const jobTitle = (job: Job, bold?: boolean) =>
   bold && bold === true
     ? `*${job.company.name}: ${job.title}*`
     : `${job.company.name}: ${job.title}`;
-
-/**
- * Returns a formatted string of the job publishing date.
- * @param jobCreatedAt Job creation date
- */
-export const publishedDate = (jobCreatedAt: string) =>
-  `Published on: ${moment(jobCreatedAt).format("DD.MM.YYYY HH:mm:ss")}`;
 
 /**
  * Generates a job.

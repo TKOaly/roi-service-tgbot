@@ -9,7 +9,6 @@ import {
   getDeadline,
   jobTitle,
   jobUrl,
-  publishedDate,
 } from "../src/MessageUtils";
 import { Job } from "../src/models/Models";
 
@@ -96,15 +95,8 @@ describe("MessageUtils", () => {
       const mockDate = moment("2019-01-25 12:10:00");
       const apply = canApply(job2, mockDate);
       expect(apply).to.equal(
-        "Applications accepted until: 27.02.2019 12:00:00 (32 day(s) remaining)",
+        "Applications accepted until: 27.02.2019 (32 days remaining)",
       );
-      done();
-    });
-  });
-  describe("publishedDate()", () => {
-    it("Formats 'published date' correctly", (done) => {
-      const apply = publishedDate("2019-02-27 12:34:56");
-      expect(apply).to.equal("Published on: 27.02.2019 12:34:56");
       done();
     });
   });
@@ -125,8 +117,6 @@ describe("MessageUtils", () => {
           "\r\n" +
           "*Test company: Job title*" +
           "\r\n" +
-          "Published on: 01.01.2019 12:00:00" +
-          "\r\n" +
           "Applications accepted until further notice" +
           "\r\n" +
           "https://jobs.tko-aly.fi/jobs/1" +
@@ -134,9 +124,7 @@ describe("MessageUtils", () => {
           "\r\n" +
           "*Test company 2: Job title*" +
           "\r\n" +
-          "Published on: 01.01.2019 12:00:00" +
-          "\r\n" +
-          "Applications accepted until: 27.02.2019 12:00:00 (26 day(s) remaining)" +
+          "Applications accepted until: 27.02.2019 (26 days remaining)" +
           "\r\n" +
           "https://jobs.tko-aly.fi/jobs/22" +
           "\r\n",
@@ -247,27 +235,27 @@ describe("MessageUtils", () => {
       const today = moment("2019-01-08 12:00:00");
       const deadline = moment("2019-01-10 12:00:00");
       const res = getDeadline(deadline, today);
-      expect(res).to.equal("2 day(s) remaining");
+      expect(res).to.equal("2 days remaining");
     });
     it("Returns '2 day(s) remaining' correctly #2", () => {
       const today = moment("2019-01-08 12:00:00");
       const deadline = moment("2019-01-10 12:00:10");
       const res = getDeadline(deadline, today);
-      expect(res).to.equal("2 day(s) remaining");
+      expect(res).to.equal("2 days remaining");
     });
     it("Returns '2 day(s) remaining' correctly #3", () => {
       const today = moment("2019-01-08 12:00:00");
       const deadline = moment("2019-01-10 12:01:00");
       const res = getDeadline(deadline, today);
       // Uses flooring in the return value
-      expect(res).to.equal("2 day(s) remaining");
+      expect(res).to.equal("2 days remaining");
     });
     it("Returns '3 day(s) remaining' correctly #1", () => {
       const today = moment("2019-01-08 12:00:00");
       const deadline = moment("2019-01-11 12:00:00");
       const res = getDeadline(deadline, today);
       // Uses flooring in the return value
-      expect(res).to.equal("3 day(s) remaining");
+      expect(res).to.equal("3 days remaining");
     });
   });
 });

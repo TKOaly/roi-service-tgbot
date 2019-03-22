@@ -95,9 +95,9 @@ export const sortJobs = (jobA: Job, jobB: Job) => {
     const jobAApplyDeadline = moment(jobA.end);
     const jobBApplyDeadline = moment(jobB.end);
     if (jobAApplyDeadline.isBefore(jobBApplyDeadline)) {
-      return 1;
-    } else if (jobBApplyDeadline.isBefore(jobAApplyDeadline)) {
       return -1;
+    } else if (jobBApplyDeadline.isBefore(jobAApplyDeadline)) {
+      return 1;
     } else {
       return 0;
     }
@@ -106,18 +106,18 @@ export const sortJobs = (jobA: Job, jobB: Job) => {
     const aCreationDate = moment(jobA.created_at);
     const bCreationDate = moment(jobB.created_at);
     if (aCreationDate.isBefore(bCreationDate)) {
-      return 1;
-    } else if (bCreationDate.isBefore(aCreationDate)) {
       return -1;
+    } else if (bCreationDate.isBefore(aCreationDate)) {
+      return 1;
     } else {
       return 0;
     }
   } else if (jobA.end === null && jobB.end !== null) {
     // Always sort the job last where there is no ending date
-    return -1;
+    return 1;
   } else if (jobA.end !== null && jobB.end === null) {
     // Always sort the job last where there is no ending date
-    return 1;
+    return -1;
   }
   return 0;
 };
