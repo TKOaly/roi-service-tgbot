@@ -11,8 +11,8 @@
     "doc": "typedoc --out doc/ src/"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "TKO-äly ry <yllapito@tko-aly.fi>",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.19.0",
     "dotenv": "^8.2.0",
