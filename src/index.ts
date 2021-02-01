@@ -129,7 +129,7 @@ const app = async (telegramApiKey: string) => {
             logger.warn('app(): Chat ID file does not exist', { chatIdFile });
         } else {
             logger.info('app(): Starting Chat ID check interval');
-            const expression = process.env.NODE_ENV === 'production' ? everyMonday : everyMinute;
+            const expression = process.env.NODE_ENV === 'production' ? everyNoon : everyMinute;
             logger.info('app(): Setting Cronjob expression', { expression });
             // Set job check interval (jobCron is asynchronous)
             cron.schedule(expression, async () => await scheduledTask(bot));
