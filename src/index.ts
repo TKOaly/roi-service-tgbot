@@ -15,7 +15,7 @@ if (!process.env.TELEGRAM_API_KEY) {
     throw new Error('Please define a Telegram API key.');
 }
 
-const everyMonday = '0 12 * * MON';
+const everyNoon = '0 12 * * *';
 const everyMinute = '* * * * *';
 
 const scheduledTask = async (bot: TelegramBot) => {
