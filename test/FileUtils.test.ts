@@ -12,7 +12,7 @@ import { join } from 'path';
 import {
     fileExistsAsync,
     getChatIds,
-    getJobsFromWeek,
+    getJobsAddedBetween,
     getNewJobPostings,
     parseChatIds,
     readFileAsync,
@@ -20,7 +20,7 @@ import {
     writeFileAsync,
 } from '../src/FileUtils';
 import { generateJob } from '../src/MessageUtils';
-import { jobsApi, jobsApiNewJobs } from './JobData';
+import { jobsApi, jobsApiByWeek, jobsApiNewJobs } from './JobData';
 
 const validIds = join(__dirname, 'files', 'testChatIds.json');
 const invalidIds = join(__dirname, 'files', 'invalidChatIds.json');
@@ -103,8 +103,8 @@ describe('FileUtils', () => {
             const mock = new MockAdapter(axios);
             // Mock API endpoint
             mock.onGet('jobs.json').reply(200, jobsApi);
-            // Get new job postings between 2019-03-11 00:00:00 and 2019-03-17 23:59:59 (Last week's all new job postings)
-            const difference = await getNewJobPostings(moment('2019-03-18 04:00:00'));
+            // Get new job postings between 2019-03-13 04:00:00 and 2019-03-14 04:00:00 (Yesterday's all new job postings)
+            const difference = await getNewJobPostings(moment('2019-03-14 04:00:00'));
             expect(difference).to.eql([...jobsApiNewJobs]);
         });
         it('Returns an empty array if malformed jobs are returned from the backend', async () => {
@@ -116,20 +116,24 @@ describe('FileUtils', () => {
             expect(difference).to.eql([]);
         });
     });
-    describe('getJobsFromWeek()', () => {
+
+    describe('getJobsAddedBetween()', () => {
         it('Returns new jobs from last week #1', done => {
-            const difference = getJobsFromWeek(jobsApi, moment('2019-03-11 04:00:00'));
+            const week = moment('2019-03-11 04:00:00');
+            const difference = getJobsAddedBetween(jobsApi, week.clone().startOf('isoWeek'), week.endOf('isoWeek'));
             // This should return 3 jobs
-            expect(difference).to.eql([...jobsApiNewJobs]);
+            expect(difference).to.eql([...jobsApiByWeek]);
             done();
         });
         it('Returns new jobs from last week #2', done => {
-            const difference = getJobsFromWeek(jobsApi, moment('2019-02-26 04:00:00'));
+            const week = moment('2019-02-26 04:00:00');
+            const difference = getJobsAddedBetween(jobsApi, week.clone().startOf('isoWeek'), week.endOf('isoWeek'));
             // This should return one job from 2019-03-02
             expect(difference).to.eql([generateJob(1, '2019-03-02 12:00:00', '2019-03-02 12:00:00')]);
             done();
         });
     });
+
     describe('sortJobs()', () => {
         it('Sorts jobs correctly', async () => {
             const momentInstance = moment('2019-03-21 21:22:20');

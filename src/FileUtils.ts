@@ -69,18 +69,19 @@ export const removeExpiredJobs = (jobs: Job[], applyDeadline: moment.Moment) => 
  * @param jobs Jobs array
  * @param date Date
  */
-export const getJobsFromWeek = (jobs: Job[], date: moment.Moment) => {
-    const start = moment(date.toISOString()).startOf('isoWeek');
-    const end = moment(date.toISOString()).endOf('isoWeek');
-    logger.info(`getJobsFromWeek(): Checking for new jobs between ${start.toISOString()} - ${end.toISOString()}`);
+export const getJobsAddedBetween = (jobs: Job[], rangeBegin: moment.Moment, rangeEnd: moment.Moment) => {
+    logger.info(
+        `getJobsAddedBetween(): Checking for new jobs between ${rangeBegin.toISOString()} - ${rangeEnd.toISOString()}`,
+    );
+
     // Filters out the jobs that are not between the thresholds
     const filteredJobs = jobs.filter(job => {
         const jobCreationTime = moment(job.created_at);
-        const between = jobCreationTime.isAfter(start) && jobCreationTime.isBefore(end);
-        return between;
+
+        return jobCreationTime.isAfter(rangeBegin) && jobCreationTime.isBefore(rangeEnd);
     });
-    const availableJobs = removeExpiredJobs([...filteredJobs], moment(date));
-    return availableJobs;
+
+    return filteredJobs;
 };
 
 /**
@@ -94,11 +95,16 @@ export const getNewJobPostings = async (date: moment.Moment) => {
         logger.error('getNewJobPostings(): Malformed jobs returned from the back-end');
         return [];
     }
-    // Get the time that was one week ago
-    const weekBefore = date.subtract(1, 'week');
-    // Filter out jobs that were added last week
-    const filtered = getJobsFromWeek(jobs, weekBefore);
-    return filtered;
+    // Get the time that was one day before
+    const dayBefore = date.clone().subtract(24, 'hours');
+
+    // Get only the jobs added during the last 24 hours
+    const addedSinceYesterday = getJobsAddedBetween(jobs, dayBefore, date);
+
+    // Filter out postings past their deadline
+    const ongoing = removeExpiredJobs([...addedSinceYesterday], date);
+
+    return ongoing;
 };
 
 /**
