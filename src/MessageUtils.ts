@@ -30,7 +30,7 @@ export const getDeadline = (jobDeadline: moment.Moment, currentDate: moment.Mome
     // Tomorrow
     if (
         !currentDate.isSame(jobDeadline, 'day') &&
-        currentDate.get('days') + 1 === jobDeadline.get('days') &&
+        currentDate.get('date') + 1 === jobDeadline.get('date') &&
         currentDate.isSame(jobDeadline, 'month') &&
         currentDate.isSame(jobDeadline, 'year')
     ) {
