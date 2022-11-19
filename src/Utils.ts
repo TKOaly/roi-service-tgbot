@@ -8,11 +8,11 @@ import { isJob, isString } from './Validators';
  * Parses Chat IDs.
  * @param chatIdArray Chat ID array
  */
-export const parseChatIds = (str: string | undefined) => {
-  if (!str) {
+export const parseChatIds = (chatIdString: string | undefined) => {
+  if (!chatIdString) {
     return [];
   }
-  const chatIdArray = JSON.parse(str);
+  const chatIdArray = JSON.parse(chatIdString);
   if (!Array.isArray(chatIdArray)) {
     return [];
   }

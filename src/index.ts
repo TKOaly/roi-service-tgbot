@@ -36,7 +36,7 @@ const scheduledTask = async (bot: TelegramBot) => {
       logger.info(`scheduledTask(): Detected ${newJobs.length} new jobs`);
       // Broadcast new jobs to every chat that has been configured in the chats.json
       await Promise.all(
-        chatIds.map(chatId => {
+        chatIds.map((chatId) => {
           logger.info('scheduledTask(): Sending job info to chat', { chatId });
           return bot.sendMessage(chatId, generateMessage(newJobs.sort(sortJobs), currentDate), {
             parse_mode: 'Markdown',
@@ -67,51 +67,24 @@ const app = async (telegramApiKey: string) => {
     // For debugging
     if (process.env.NODE_ENV === 'development') {
       // Sends a test broadcast
+      bot.onText(/^\/test$/, (msg, match) => {
+        scheduledTask(bot);
+      });
       bot.onText(/^\/testbroadcast$/, (msg, match) => {
         const chatId = msg.chat.id;
         const jobs = [
           // Deadline in 26 hours
-          generateJob(
-            3,
-            moment().toISOString(),
-            moment()
-              .add('26', 'hours')
-              .toISOString(),
-          ),
+          generateJob(3, moment().toISOString(), moment().add('26', 'hours').toISOString()),
           // Deadline in 22 hours
-          generateJob(
-            4,
-            moment().toISOString(),
-            moment()
-              .add('22', 'hours')
-              .toISOString(),
-          ),
+          generateJob(4, moment().toISOString(), moment().add('22', 'hours').toISOString()),
           // Deadline in 12 hours
-          generateJob(
-            2,
-            moment().toISOString(),
-            moment()
-              .add('12', 'hours')
-              .toISOString(),
-          ),
+          generateJob(2, moment().toISOString(), moment().add('12', 'hours').toISOString()),
           // Deadline in 22 hours
-          generateJob(
-            5,
-            moment().toISOString(),
-            moment()
-              .add('3', 'days')
-              .toISOString(),
-          ),
+          generateJob(5, moment().toISOString(), moment().add('3', 'days').toISOString()),
           // Deadline not set
           generateJob(6, moment().toISOString()),
           // Deadline in 12 minutes
-          generateJob(
-            1,
-            moment().toISOString(),
-            moment()
-              .add('12', 'minutes')
-              .toISOString(),
-          ),
+          generateJob(1, moment().toISOString(), moment().add('12', 'minutes').toISOString()),
         ].sort(sortJobs);
         bot.sendMessage(
           chatId,
@@ -133,7 +106,7 @@ const app = async (telegramApiKey: string) => {
     // Set job check interval (jobCron is asynchronous)
     cron.schedule(expression, async () => await scheduledTask(bot));
   } catch (err) {
-    logger.error(err.toString());
+    logger.error(err);
   }
 };
 

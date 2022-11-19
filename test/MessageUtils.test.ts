@@ -61,30 +61,30 @@ const job2: Job = {
 
 describe('MessageUtils', () => {
   describe('jobTitle()', () => {
-    it('Formats title correctly (bold)', done => {
+    it('Formats title correctly (bold)', (done) => {
       const title = jobTitle(job1, true);
       expect(title).to.equal('*Test company: Job title*');
       done();
     });
-    it('Formats title correctly (non-bold) #1', done => {
+    it('Formats title correctly (non-bold) #1', (done) => {
       const title = jobTitle(job1, false);
       expect(title).to.equal('Test company: Job title');
       done();
     });
-    it('Formats title correctly (non-bold) #2', done => {
+    it('Formats title correctly (non-bold) #2', (done) => {
       const title = jobTitle(job1);
       expect(title).to.equal('Test company: Job title');
       done();
     });
   });
   describe('canApply()', () => {
-    it("Formats 'can apply' correctly", done => {
+    it("Formats 'can apply' correctly", (done) => {
       const mockDate = moment();
       const apply = canApply(job1, mockDate);
       expect(apply).to.equal('Applications accepted until further notice');
       done();
     });
-    it("Formats 'can apply' correctly", done => {
+    it("Formats 'can apply' correctly", (done) => {
       const mockDate = moment('2019-01-25 12:10:00');
       const apply = canApply(job2, mockDate);
       expect(apply).to.equal('Applications accepted until: 27.02.2019 (32 days remaining)');
@@ -92,14 +92,14 @@ describe('MessageUtils', () => {
     });
   });
   describe('jobUrl()', () => {
-    it('Formats URL correctly', done => {
+    it('Formats URL correctly', (done) => {
       const urli = jobUrl(job1);
       expect(urli).to.equal('https://jobs.tko-aly.fi/jobs/1');
       done();
     });
   });
   describe('generateMessage()', () => {
-    it('Generates Job listing correctly', done => {
+    it('Generates Job listing correctly', (done) => {
       const mockDate = moment('2019-02-01 12:00:00');
       const msg = generateMessage([job1, job2], mockDate);
       expect(msg).to.equal(
@@ -124,7 +124,7 @@ describe('MessageUtils', () => {
     });
   });
   describe('generateJob()', () => {
-    it('Generates job correctly (no end date)', done => {
+    it('Generates job correctly (no end date)', (done) => {
       const job = generateJob(55, '2019-01-01 13:00:00');
       expect(job).to.eql({
         id: 55,
@@ -154,7 +154,7 @@ describe('MessageUtils', () => {
       });
       done();
     });
-    it('Generates job correctly (end date set)', done => {
+    it('Generates job correctly (end date set)', (done) => {
       const job = generateJob(55, '2019-01-01 13:00:00', '2019-01-15 13:00:00');
       expect(job).to.eql({
         id: 55,

@@ -61,7 +61,7 @@ export const jobUrl = (job: Job) => url.resolve('https://jobs.tko-aly.fi/', ['jo
 export const generateMessage = (jobs: Job[], currentDate: moment.Moment) => {
   let str = '';
   str += `New career opportunities on the job board!\r\n`;
-  jobs.forEach(job => {
+  jobs.forEach((job) => {
     str += `\r\n${jobTitle(job, true)}\r\n${canApply(job, currentDate)}\r\n${jobUrl(job)}\r\n`;
   });
   return str;

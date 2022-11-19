@@ -1,0 +1,11 @@
+doc/
+logs/
+node_modules
+.env
+*.log
+src/data/jobs.json
+src/data/chats.json
+.nyc_output
+test/files/tmp.txt
+coverage
+.vscode

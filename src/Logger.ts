@@ -27,7 +27,7 @@ const logger = winston.createLogger({
     winston.format.metadata(),
     winston.format.timestamp(),
     winston.format.printf(
-      info => `${info.timestamp} ${info.level}: ${info.message} (metadata: ${JSON.stringify(info.metadata)})`,
+      (info) => `${info.timestamp} ${info.level}: ${info.message} (metadata: ${JSON.stringify(info.metadata)})`,
     ),
   ),
   transports,
