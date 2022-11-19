@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# Except these
+!src/
+!logs/
+!package.json
+!package-lock.json
+!README.md
+!tsconfig.json
