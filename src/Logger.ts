@@ -1,22 +1,6 @@
 import winston from 'winston';
 
-const transports =
-  process.env.NODE_ENV === 'test'
-    ? [new winston.transports.Console()]
-    : [
-        new winston.transports.File({
-          filename: 'error.log',
-          level: 'error',
-          maxsize: 500000,
-          dirname: 'logs',
-        }),
-        new winston.transports.File({
-          filename: 'combined.log',
-          maxsize: 500000,
-          dirname: 'logs',
-        }),
-        new winston.transports.Console(),
-      ];
+const transports = [new winston.transports.Console()];
 
 /**
  * Logger instance.
