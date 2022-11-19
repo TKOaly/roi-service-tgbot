@@ -9,17 +9,17 @@ import { isJob, isString } from './Validators';
  * @param chatIdArray Chat ID array
  */
 export const parseChatIds = (str: string | undefined) => {
-    if (!str) {
-      return [];
-    }
-    const chatIdArray = JSON.parse(str);
-    if (!Array.isArray(chatIdArray)) {
-        return [];
-    }
-    if (!chatIdArray.every(isString)) {
-        return [];
-    }
-    return Array.from<string>(chatIdArray);
+  if (!str) {
+    return [];
+  }
+  const chatIdArray = JSON.parse(str);
+  if (!Array.isArray(chatIdArray)) {
+    return [];
+  }
+  if (!chatIdArray.every(isString)) {
+    return [];
+  }
+  return Array.from<string>(chatIdArray);
 };
 
 /**
@@ -28,18 +28,18 @@ export const parseChatIds = (str: string | undefined) => {
  * @param applyDeadline Job apply deadline
  */
 export const removeExpiredJobs = (jobs: Job[], applyDeadline: moment.Moment) => [
-    ...jobs.filter(job => {
-        // If no ending date is set, return as default
-        if (job.end === null) {
-            return true;
-        }
-        // If the ending date is same or before the current date, filter the job out
-        if (moment(job.end).isSameOrBefore(applyDeadline)) {
-            return false;
-        }
-        // In other cases, return as default
-        return true;
-    }),
+  ...jobs.filter((job) => {
+    // If no ending date is set, return as default
+    if (job.end === null) {
+      return true;
+    }
+    // If the ending date is same or before the current date, filter the job out
+    if (moment(job.end).isSameOrBefore(applyDeadline)) {
+      return false;
+    }
+    // In other cases, return as default
+    return true;
+  }),
 ];
 
 /**
@@ -48,18 +48,18 @@ export const removeExpiredJobs = (jobs: Job[], applyDeadline: moment.Moment) => 
  * @param date Date
  */
 export const getJobsAddedBetween = (jobs: Job[], rangeBegin: moment.Moment, rangeEnd: moment.Moment) => {
-    logger.info(
-        `getJobsAddedBetween(): Checking for new jobs between ${rangeBegin.toISOString()} - ${rangeEnd.toISOString()}`,
-    );
+  logger.info(
+    `getJobsAddedBetween(): Checking for new jobs between ${rangeBegin.toISOString()} - ${rangeEnd.toISOString()}`,
+  );
 
-    // Filters out the jobs that are not between the thresholds
-    const filteredJobs = jobs.filter(job => {
-        const jobCreationTime = moment(job.created_at);
+  // Filters out the jobs that are not between the thresholds
+  const filteredJobs = jobs.filter((job) => {
+    const jobCreationTime = moment(job.created_at);
 
-        return jobCreationTime.isAfter(rangeBegin) && jobCreationTime.isBefore(rangeEnd);
-    });
+    return jobCreationTime.isAfter(rangeBegin) && jobCreationTime.isBefore(rangeEnd);
+  });
 
-    return filteredJobs;
+  return filteredJobs;
 };
 
 /**
@@ -67,22 +67,22 @@ export const getJobsAddedBetween = (jobs: Job[], rangeBegin: moment.Moment, rang
  * @param date Moment instance
  */
 export const getNewJobPostings = async (date: moment.Moment) => {
-    // Fetch jobs from the back-end
-    const jobs = await getJobs();
-    if (!jobs.every(isJob)) {
-        logger.error('getNewJobPostings(): Malformed jobs returned from the back-end');
-        return [];
-    }
-    // Get the time that was one day before
-    const dayBefore = date.clone().subtract(2, 'months');
+  // Fetch jobs from the back-end
+  const jobs = await getJobs();
+  if (!jobs.every(isJob)) {
+    logger.error('getNewJobPostings(): Malformed jobs returned from the back-end');
+    return [];
+  }
+  // Get the time that was one day before
+  const dayBefore = date.clone().subtract(1, 'days');
 
-    // Get only the jobs added during the last 24 hours
-    const addedSinceYesterday = getJobsAddedBetween(jobs, dayBefore, date);
+  // Get only the jobs added during the last 24 hours
+  const addedSinceYesterday = getJobsAddedBetween(jobs, dayBefore, date);
 
-    // Filter out postings past their deadline
-    const ongoing = removeExpiredJobs([...addedSinceYesterday], date);
+  // Filter out postings past their deadline
+  const ongoing = removeExpiredJobs([...addedSinceYesterday], date);
 
-    return ongoing;
+  return ongoing;
 };
 
 /**
@@ -97,34 +97,34 @@ export const getNewJobPostings = async (date: moment.Moment) => {
  * @param jobB Job B
  */
 export const sortJobs = (jobA: Job, jobB: Job) => {
-    // If both jobs have an ending date, sort them by its value
-    if (jobA.end !== null && jobB.end !== null) {
-        const jobAApplyDeadline = moment(jobA.end);
-        const jobBApplyDeadline = moment(jobB.end);
-        if (jobAApplyDeadline.isBefore(jobBApplyDeadline)) {
-            return -1;
-        } else if (jobBApplyDeadline.isBefore(jobAApplyDeadline)) {
-            return 1;
-        } else {
-            return 0;
-        }
-    } else if (jobA.end === null && jobB.end === null) {
-        // If both jobs don't have an end date set, sort the jobs by their creation date
-        const aCreationDate = moment(jobA.created_at);
-        const bCreationDate = moment(jobB.created_at);
-        if (aCreationDate.isBefore(bCreationDate)) {
-            return -1;
-        } else if (bCreationDate.isBefore(aCreationDate)) {
-            return 1;
-        } else {
-            return 0;
-        }
-    } else if (jobA.end === null && jobB.end !== null) {
-        // Always sort the job last where there is no ending date
-        return 1;
-    } else if (jobA.end !== null && jobB.end === null) {
-        // Always sort the job last where there is no ending date
-        return -1;
+  // If both jobs have an ending date, sort them by its value
+  if (jobA.end !== null && jobB.end !== null) {
+    const jobAApplyDeadline = moment(jobA.end);
+    const jobBApplyDeadline = moment(jobB.end);
+    if (jobAApplyDeadline.isBefore(jobBApplyDeadline)) {
+      return -1;
+    } else if (jobBApplyDeadline.isBefore(jobAApplyDeadline)) {
+      return 1;
+    } else {
+      return 0;
     }
-    return 0;
+  } else if (jobA.end === null && jobB.end === null) {
+    // If both jobs don't have an end date set, sort the jobs by their creation date
+    const aCreationDate = moment(jobA.created_at);
+    const bCreationDate = moment(jobB.created_at);
+    if (aCreationDate.isBefore(bCreationDate)) {
+      return -1;
+    } else if (bCreationDate.isBefore(aCreationDate)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  } else if (jobA.end === null && jobB.end !== null) {
+    // Always sort the job last where there is no ending date
+    return 1;
+  } else if (jobA.end !== null && jobB.end === null) {
+    // Always sort the job last where there is no ending date
+    return -1;
+  }
+  return 0;
 };

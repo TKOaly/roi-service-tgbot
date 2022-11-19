@@ -9,7 +9,7 @@ import { Job } from './models/Models';
  * @param bold Title in bold
  */
 export const jobTitle = (job: Job, bold?: boolean) =>
-    bold && bold === true ? `*${job.company.name}: ${job.title}*` : `${job.company.name}: ${job.title}`;
+  bold && bold === true ? `*${job.company.name}: ${job.title}*` : `${job.company.name}: ${job.title}`;
 
 /**
  * Returns the deadline as a formatted string for a Job.
@@ -17,35 +17,35 @@ export const jobTitle = (job: Job, bold?: boolean) =>
  * @param currentDate Current date
  */
 export const getDeadline = (jobDeadline: moment.Moment, currentDate: moment.Moment) => {
-    const left = moment.duration(moment(jobDeadline).diff(currentDate)).asDays();
-    // Today
-    if (
-        currentDate.isSame(jobDeadline, 'day') &&
-        currentDate.isSame(jobDeadline, 'month') &&
-        currentDate.isSame(jobDeadline, 'year') &&
-        left <= 1
-    ) {
-        return 'Deadline today';
-    }
-    // Tomorrow
-    if (
-        !currentDate.isSame(jobDeadline, 'day') &&
-        currentDate.get('date') + 1 === jobDeadline.get('date') &&
-        currentDate.isSame(jobDeadline, 'month') &&
-        currentDate.isSame(jobDeadline, 'year')
-    ) {
-        return 'Deadline tomorrow';
-    }
-    return `${Math.floor(left)} days remaining`;
+  const left = moment.duration(moment(jobDeadline).diff(currentDate)).asDays();
+  // Today
+  if (
+    currentDate.isSame(jobDeadline, 'day') &&
+    currentDate.isSame(jobDeadline, 'month') &&
+    currentDate.isSame(jobDeadline, 'year') &&
+    left <= 1
+  ) {
+    return 'Deadline today';
+  }
+  // Tomorrow
+  if (
+    !currentDate.isSame(jobDeadline, 'day') &&
+    currentDate.get('date') + 1 === jobDeadline.get('date') &&
+    currentDate.isSame(jobDeadline, 'month') &&
+    currentDate.isSame(jobDeadline, 'year')
+  ) {
+    return 'Deadline tomorrow';
+  }
+  return `${Math.floor(left)} days remaining`;
 };
 
 export const canApply = (job: Job, currentDate: moment.Moment) =>
-    job.end !== null
-        ? `Applications accepted until: ${moment(job.end).format('DD.MM.YYYY')} (${getDeadline(
-              moment(job.end),
-              currentDate,
-          )})`
-        : 'Applications accepted until further notice';
+  job.end !== null
+    ? `Applications accepted until: ${moment(job.end).format('DD.MM.YYYY')} (${getDeadline(
+        moment(job.end),
+        currentDate,
+      )})`
+    : 'Applications accepted until further notice';
 
 /**
  * Returns the Job board URL of the job.
@@ -59,12 +59,12 @@ export const jobUrl = (job: Job) => url.resolve('https://jobs.tko-aly.fi/', ['jo
  * @param currentDate Current date. Parses the date and adds the time range to the title
  */
 export const generateMessage = (jobs: Job[], currentDate: moment.Moment) => {
-    let str = '';
-    str += `New career opportunities on the job board!\r\n`;
-    jobs.forEach(job => {
-        str += `\r\n${jobTitle(job, true)}\r\n${canApply(job, currentDate)}\r\n${jobUrl(job)}\r\n`;
-    });
-    return str;
+  let str = '';
+  str += `New career opportunities on the job board!\r\n`;
+  jobs.forEach(job => {
+    str += `\r\n${jobTitle(job, true)}\r\n${canApply(job, currentDate)}\r\n${jobUrl(job)}\r\n`;
+  });
+  return str;
 };
 
 /**
@@ -74,28 +74,28 @@ export const generateMessage = (jobs: Job[], currentDate: moment.Moment) => {
  * @param end Ending date
  */
 export const generateJob = (id: number, localDate: string, end?: string): Job => ({
-    id,
-    company: {
-        id: 1,
-        name: 'Test company',
-        logo: 'test_company.png',
-        sponsored: true,
-        website: 'example.com',
-        created_at: localDate,
-        updated_at: localDate,
-    },
-    description: 'Job desc',
-    title: 'Test job ' + id,
-    url: 'example.com/job_' + id,
-    begin: localDate,
+  id,
+  company: {
+    id: 1,
+    name: 'Test company',
+    logo: 'test_company.png',
+    sponsored: true,
+    website: 'example.com',
     created_at: localDate,
-    end: end && end !== undefined ? moment(end).format('YYYY-MM-DD HH:mm:ss') : null,
-    tags: [
-        {
-            id: 1,
-            created_at: localDate,
-            name: 'devops',
-            updated_at: localDate,
-        },
-    ],
+    updated_at: localDate,
+  },
+  description: 'Job desc',
+  title: 'Test job ' + id,
+  url: 'example.com/job_' + id,
+  begin: localDate,
+  created_at: localDate,
+  end: end && end !== undefined ? moment(end).format('YYYY-MM-DD HH:mm:ss') : null,
+  tags: [
+    {
+      id: 1,
+      created_at: localDate,
+      name: 'devops',
+      updated_at: localDate,
+    },
+  ],
 });
