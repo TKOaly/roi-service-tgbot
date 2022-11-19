@@ -8,25 +8,9 @@ import { expect } from 'chai';
 import fs from 'fs';
 import 'mocha';
 import moment from 'moment';
-import { join } from 'path';
-import {
-    fileExistsAsync,
-    getChatIds,
-    getJobsAddedBetween,
-    getNewJobPostings,
-    parseChatIds,
-    readFileAsync,
-    sortJobs,
-    writeFileAsync,
-} from '../src/FileUtils';
+import { getJobsAddedBetween, getNewJobPostings, parseChatIds, sortJobs } from '../src/Utils';
 import { generateJob } from '../src/MessageUtils';
 import { jobsApi, jobsApiByWeek, jobsApiNewJobs } from './JobData';
-
-const validIds = join(__dirname, 'files', 'testChatIds.json');
-const invalidIds = join(__dirname, 'files', 'invalidChatIds.json');
-const testFile = join(__dirname, 'files', 'testFile.txt');
-const notExists = join(__dirname, 'files', 'notExists.txt');
-const tmpTestFile = join(__dirname, 'files', 'tmp.txt');
 
 /**
  * Deletes a file if found on disk.
@@ -39,63 +23,18 @@ const setupWrite = (fileName: fs.PathLike) => {
 };
 
 describe('FileUtils', () => {
-    describe('getChatIds()', () => {
-        it('Returns an empty array on a malformed Chat ID file', async () => {
-            const chatIds = await getChatIds(invalidIds);
-            expect(chatIds).to.eql([]);
-        });
-        it('Returns an array of Chat IDs with the correct file', async () => {
-            const chatIds = await getChatIds(validIds);
-            expect(chatIds).to.eql(['12345', '67890']);
-        });
-    });
     describe('parseChatIds()', () => {
         it("Parses Chat ID's correctly #1", async () => {
-            const chatIds = parseChatIds(JSON.parse('["12345", "67890"]'));
+            const chatIds = parseChatIds('["12345", "67890"]');
             expect(chatIds).to.eql(['12345', '67890']);
         });
         it("Parses Chat ID's correctly #1", async () => {
-            const chatIds = parseChatIds(JSON.parse('12345'));
+            const chatIds = parseChatIds('12345');
             expect(chatIds).to.eql([]);
         });
         it("Parses Chat ID's correctly #3", async () => {
-            const chatIds = parseChatIds(JSON.parse('[1, 2, 3, 4, 5]'));
+            const chatIds = parseChatIds('[1, 2, 3, 4, 5]');
             expect(chatIds).to.eql([]);
-        });
-    });
-    describe('readFileAsync()', () => {
-        it('Reads file correctly', async () => {
-            const res = await readFileAsync(testFile);
-            expect(res.toString()).to.equal('Hello World\nTest 123');
-        });
-    });
-    describe('writeFileAsync()', () => {
-        beforeEach(done => {
-            // Setup (native funcs)
-            setupWrite(tmpTestFile);
-            done();
-        });
-        afterEach(done => {
-            setupWrite(tmpTestFile);
-            done();
-        });
-        it('Writes to file correctly', async () => {
-            const data = 'Hello World\nTest 123';
-            // Write asynchronously
-            await writeFileAsync(tmpTestFile, data);
-            // Read synchronously (native func)
-            const res = fs.readFileSync(tmpTestFile);
-            expect(res.toString()).to.equal(data);
-        });
-    });
-    describe('fileExistsAsync()', () => {
-        it('Returns true if file exists', async () => {
-            const exists = await fileExistsAsync(testFile);
-            expect(exists).to.equal(true);
-        });
-        it('Returns false if file does not exists', async () => {
-            const exists = await fileExistsAsync(notExists);
-            expect(exists).to.equal(false);
         });
     });
     describe('getNewJobPostings()', () => {

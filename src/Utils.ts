@@ -1,30 +1,18 @@
-import fs from 'fs';
-import { promisify } from 'util';
-import { getJobs } from './services/JobService';
-
 import moment from 'moment';
 import { logger } from './Logger';
 import { Job } from './models/Models';
+import { getJobs } from './services/JobService';
 import { isJob, isString } from './Validators';
-
-/**
- * Writes a file asynchronously. Wrapped into a promise.
- */
-export const writeFileAsync = promisify(fs.writeFile);
-/**
- * Reads a file asynchronously. Wrapped into a promise.
- */
-export const readFileAsync = promisify(fs.readFile);
-/**
- *  Checks if a file exists asynchronously. Wrapped into a promise.
- */
-export const fileExistsAsync = promisify(fs.exists);
 
 /**
  * Parses Chat IDs.
  * @param chatIdArray Chat ID array
  */
-export const parseChatIds = (chatIdArray: unknown) => {
+export const parseChatIds = (str: string | undefined) => {
+    if (!str) {
+      return [];
+    }
+    const chatIdArray = JSON.parse(str);
     if (!Array.isArray(chatIdArray)) {
         return [];
     }
@@ -32,16 +20,6 @@ export const parseChatIds = (chatIdArray: unknown) => {
         return [];
     }
     return Array.from<string>(chatIdArray);
-};
-
-/**
- * Returns Chat IDs.
- * @param chatIdFile Chat ID file
- */
-export const getChatIds = async (chatIdFile: string) => {
-    const fileChatIds = await readFileAsync(chatIdFile);
-    const rawChatIds = JSON.parse(fileChatIds.toString());
-    return parseChatIds(rawChatIds);
 };
 
 /**
@@ -96,7 +74,7 @@ export const getNewJobPostings = async (date: moment.Moment) => {
         return [];
     }
     // Get the time that was one day before
-    const dayBefore = date.clone().subtract(24, 'hours');
+    const dayBefore = date.clone().subtract(2, 'months');
 
     // Get only the jobs added during the last 24 hours
     const addedSinceYesterday = getJobsAddedBetween(jobs, dayBefore, date);

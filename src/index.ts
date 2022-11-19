@@ -5,14 +5,17 @@ import moment from 'moment';
 import 'moment/locale/fi';
 
 import TelegramBot from 'node-telegram-bot-api';
-import { chatIdFile } from './Constants';
-import { fileExistsAsync, getChatIds, getNewJobPostings, sortJobs } from './FileUtils';
+import { parseChatIds, getNewJobPostings, sortJobs } from './Utils';
 import { logger } from './Logger';
 import { generateJob, generateMessage } from './MessageUtils';
 dotenv.config();
 
 if (!process.env.TELEGRAM_API_KEY) {
     throw new Error('Please define a Telegram API key.');
+}
+
+if (!process.env.CHAT_IDS_JSON) {
+    throw new Error('Please define CHAT_IDS_JSON');
 }
 
 const everyNoon = '0 12 * * *';
@@ -26,7 +29,7 @@ const scheduledTask = async (bot: TelegramBot) => {
     if (newJobs.length > 0) {
         // Get available Chat IDs
         logger.info('scheduledTask(): Reading chat IDs to broadcast');
-        const chatIds = await getChatIds(chatIdFile);
+        const chatIds = parseChatIds(process.env.CHAT_IDS_JSON);
         const currentDate = moment();
         // If there are chats that are configured, map them through
         if (chatIds.length > 0) {
@@ -124,16 +127,11 @@ const app = async (telegramApiKey: string) => {
             });
         }
 
-        const exists = await fileExistsAsync(chatIdFile);
-        if (!exists) {
-            logger.warn('app(): Chat ID file does not exist', { chatIdFile });
-        } else {
-            logger.info('app(): Starting Chat ID check interval');
-            const expression = process.env.NODE_ENV === 'production' ? everyNoon : everyMinute;
-            logger.info('app(): Setting Cronjob expression', { expression });
-            // Set job check interval (jobCron is asynchronous)
-            cron.schedule(expression, async () => await scheduledTask(bot));
-        }
+        logger.info('app(): Starting Chat ID check interval');
+        const expression = process.env.NODE_ENV === 'production' ? everyNoon : everyMinute;
+        logger.info('app(): Setting Cronjob expression', { expression });
+        // Set job check interval (jobCron is asynchronous)
+        cron.schedule(expression, async () => await scheduledTask(bot));
     } catch (err) {
         logger.error(err.toString());
     }
