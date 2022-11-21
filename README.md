@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A Telegram bot to broadcast Jobs service notifications
+A Telegram bot to broadcast Job Service notifications
 
 ## Installation
 
