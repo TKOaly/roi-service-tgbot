@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A Telegram bot to broadcast Job Service notifications
+A Telegram bot to broadcast [Job Service](https://github.com/TKOaly/jobs-service) notifications
 
 ## Installation
 
